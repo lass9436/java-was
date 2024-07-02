@@ -51,7 +51,7 @@ class MyServerWithSingleThreadTest {
 			CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
 				HttpClient httpClient = HttpClient.newHttpClient();
 				HttpRequest httpRequest = HttpRequest.newBuilder()
-					.uri(URI.create("http://localhost:8080"))
+					.uri(URI.create("http://localhost:8081"))
 					.GET()
 					.build();
 				try {
