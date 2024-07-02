@@ -22,6 +22,26 @@ public class HttpResponse {
 		this.body = body;
 	}
 
+	public String getVersion() {
+		return version;
+	}
+
+	public int getStatusCode() {
+		return statusCode;
+	}
+
+	public String getStatusMessage() {
+		return statusMessage;
+	}
+
+	public Map<String, List<String>> getHeaders() {
+		return headers;
+	}
+
+	public String getBody() {
+		return body;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder response = new StringBuilder();
