@@ -17,6 +17,8 @@ public class MyServer {
 	private static final int THREAD_POOL_SIZE = 10;
 	private static final ExecutorService threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
+	private volatile boolean running = true;
+
 	private final int PORT = 8080;
 	private MySocket mySocket;
 
@@ -29,8 +31,14 @@ public class MyServer {
 	}
 
 	public static void start() throws IOException {
-		while (true) {
+		while (instance.running) {
 			threadPool.submit(new MyRunnable(instance.mySocket.accept()));
 		}
+	}
+
+	public static void stop() throws IOException {
+		instance.running = false;
+		instance.mySocket.close();
+		threadPool.shutdown();
 	}
 }
