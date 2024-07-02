@@ -11,6 +11,8 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import codesquad.httpRequest.HttpRequestParser;
+
 public class MyRunnable implements Runnable {
 
 	private static final Logger logger = LoggerFactory.getLogger(MyRunnable.class);
@@ -30,12 +32,7 @@ public class MyRunnable implements Runnable {
 			logger.info("Client connected");
 
 			// HTTP Request 로그 debug 출력
-			String requestLine;
-			StringBuilder requestBuilder = new StringBuilder();
-			while (!(requestLine = clientInputReader.readLine()).isEmpty()) {
-				requestBuilder.append(requestLine + "\r\n");
-			}
-			logger.debug(requestBuilder.toString());
+			logger.debug(HttpRequestParser.parse(clientInputReader).toString());
 
 			// HTTP Response Status
 			clientOutput.write("HTTP/1.1 200 OK\r\n".getBytes());
@@ -51,8 +48,6 @@ public class MyRunnable implements Runnable {
 
 			// write flush
 			clientOutput.flush();
-		} catch (FileNotFoundException e) {
-			logger.error(e.getMessage());
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 		}
