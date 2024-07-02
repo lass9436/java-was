@@ -24,7 +24,7 @@ public class MyServer {
 
 	private MyServer() {
 		try {
-			mySocket = new MySocket(PORT);
+			mySocket = new MySocket(PORT, 5);
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 		}
