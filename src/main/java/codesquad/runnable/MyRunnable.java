@@ -1,7 +1,6 @@
 package codesquad.runnable;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -30,8 +29,7 @@ public class MyRunnable implements Runnable {
 	@Override
 	public void run() {
 		try (OutputStream clientOutput = socket.getOutputStream();
-			 BufferedReader clientInputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			 BufferedReader fileReader = new BufferedReader(new FileReader("src/main/resources/static/index.html"));) {
+			 BufferedReader clientInputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 			// 클라이언트 연결 로그 출력
 			logger.info("Client connected");
 
