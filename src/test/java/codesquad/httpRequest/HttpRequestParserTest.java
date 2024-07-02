@@ -13,7 +13,64 @@ import org.junit.jupiter.api.Test;
 class HttpRequestParserTest {
 
 	@Test
-	void 요청라인과_헤더를_파싱한다() throws IOException {
+	void 요청_라인이_비어있는_경우_예외_발생() {
+		String httpRequestString = "\r\n";
+
+		BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+			HttpRequestParser.parse(reader);
+		});
+
+		assertEquals("요청 라인이 비어있습니다.", exception.getMessage());
+	}
+
+	@Test
+	void 요청_라인_형식이_잘못된_경우_예외_발생() {
+		String httpRequestString = "GET /index.html\r\n";  // 잘못된 형식
+
+		BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+			HttpRequestParser.parse(reader);
+		});
+
+		assertEquals("요청 라인 형식이 잘못되었습니다.", exception.getMessage());
+	}
+
+	@Test
+	void 헤더_라인_형식이_잘못된_경우_예외_발생() {
+		String httpRequestString =
+			"GET /index.html HTTP/1.1\r\n" +
+			"Host: localhost:8080\r\n" +
+			"Connection keep-alive\r\n" + // 잘못된 헤더 형식 (콜론이 없음)
+			"\r\n";
+
+		BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+			HttpRequestParser.parse(reader);
+		});
+
+		assertEquals("헤더 라인 형식이 잘못되었습니다.", exception.getMessage());
+	}
+
+	@Test
+	void 헤더_키_또는_밸류가_비어있는_경우_예외_발생() {
+		String httpRequestString =
+			"GET /index.html HTTP/1.1\r\n" +
+			"Host: \r\n" +  // 밸류가 비어있음
+			"Connection: keep-alive\r\n" +
+			"\r\n";
+
+		BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+			HttpRequestParser.parse(reader);
+		});
+
+		assertEquals("헤더 키 또는 밸류가 비어있습니다.", exception.getMessage());
+	}
+
+
+	@Test
+	void 요청_라인과_헤더를_파싱한다() throws IOException {
 		String httpRequestString =
 			"GET /index.html HTTP/1.1\r\n" +
 			"Host: localhost:8080\r\n" +
