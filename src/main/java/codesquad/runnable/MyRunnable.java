@@ -1,7 +1,6 @@
 package codesquad.runnable;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -46,7 +45,7 @@ public class MyRunnable implements Runnable {
 
 			// write flush
 			clientOutput.flush();
-		} catch (IOException e) {
+		} catch (IOException | IllegalArgumentException e) {
 			logger.error(e.getMessage());
 		}
 	}
