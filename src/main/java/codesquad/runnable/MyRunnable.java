@@ -1,8 +1,6 @@
 package codesquad.runnable;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -11,11 +9,18 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import codesquad.httpHandler.HttpHandler;
+import codesquad.httpRequest.HttpRequest;
+import codesquad.httpRequest.HttpRequestParser;
+import codesquad.httpResponse.HttpResponse;
+
 public class MyRunnable implements Runnable {
 
 	private static final Logger logger = LoggerFactory.getLogger(MyRunnable.class);
 
 	private final Socket socket;
+
+	private final HttpHandler httpHandler = new HttpHandler();
 
 	public MyRunnable(Socket clientSocket) {
 		socket = clientSocket;
@@ -24,36 +29,21 @@ public class MyRunnable implements Runnable {
 	@Override
 	public void run() {
 		try (OutputStream clientOutput = socket.getOutputStream();
-			 BufferedReader clientInputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			 BufferedReader fileReader = new BufferedReader(new FileReader("src/main/resources/static/index.html"));) {
+			 BufferedReader clientInputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 			// 클라이언트 연결 로그 출력
 			logger.info("Client connected");
 
-			// HTTP Request 로그 debug 출력
-			String requestLine;
-			StringBuilder requestBuilder = new StringBuilder();
-			while (!(requestLine = clientInputReader.readLine()).isEmpty()) {
-				requestBuilder.append(requestLine + "\r\n");
-			}
-			logger.debug(requestBuilder.toString());
+			// HTTP Request
+			HttpRequest httpRequest = HttpRequestParser.parse(clientInputReader);
+			logger.debug(httpRequest.toString());
 
-			// HTTP Response Status
-			clientOutput.write("HTTP/1.1 200 OK\r\n".getBytes());
-			// Content-Type header
-			clientOutput.write("Content-Type: text/html\r\n".getBytes());
-			clientOutput.write("\r\n".getBytes());
-			// Response Body
-			String line = null;
-			while ((line = fileReader.readLine()) != null) {
-				clientOutput.write(line.getBytes());
-				clientOutput.write("\r\n".getBytes());
-			}
+			// HTTP Response
+			HttpResponse httpResponse = httpHandler.handle(httpRequest);
+			clientOutput.write(httpResponse.toString().getBytes());
 
 			// write flush
 			clientOutput.flush();
-		} catch (FileNotFoundException e) {
-			logger.error(e.getMessage());
-		} catch (IOException e) {
+		} catch (IOException | IllegalArgumentException e) {
 			logger.error(e.getMessage());
 		}
 	}
