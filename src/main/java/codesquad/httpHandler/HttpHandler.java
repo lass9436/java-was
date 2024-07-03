@@ -32,9 +32,15 @@ public class HttpHandler {
 		"ico", "image/x-icon"
 	);
 
+	private static final Map<String, String> urlMapping = Map.of(
+		"/", "/index.html",
+		"/registration", "/registration/index.html"
+	);
+
 	public HttpResponse handle(HttpRequest httpRequest) throws IOException {
-		String url = httpRequest.getUrl().equals("/") ? "/index.html" : httpRequest.getUrl();
-		File file = new File(STATIC_ROOT_PATH + url);
+		String url = httpRequest.getUrl();
+		String path = urlMapping.getOrDefault(url, url);
+		File file = new File(STATIC_ROOT_PATH + path);
 
 		if (!file.exists() || file.isDirectory()) {
 			return new HttpResponse(httpRequest.getVersion(), 404, "Not Found", Map.of(), "<h1>404 Not Found</h1>");
