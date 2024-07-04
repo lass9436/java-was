@@ -72,7 +72,7 @@ public class HttpRequestParser {
 			headers, queryParams);
 	}
 
-	private static Map<String, List<String>> parseQueryParams(String queryString) {
+	public static Map<String, List<String>> parseQueryParams(String queryString) {
 		Map<String, List<String>> queryParams = new HashMap<>();
 		if (queryString == null || queryString.isEmpty()) {
 			return queryParams;
