@@ -1,8 +1,10 @@
-package codesquad.http;
+package codesquad.http.dto;
 
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+
+import codesquad.http.status.HttpStatus;
 
 public record HttpResponse(String version, int statusCode, String statusMessage, Map<String, List<String>> headers,
 						   byte[] body) {

@@ -1,4 +1,4 @@
-package codesquad.http;
+package codesquad.http.dto;
 
 import java.util.List;
 import java.util.Map;

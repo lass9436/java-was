@@ -1,4 +1,4 @@
-package codesquad.http;
+package codesquad.http.handler;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,6 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sun.net.httpserver.HttpHandler;
+
+import codesquad.http.dto.HttpRequest;
+import codesquad.http.dto.HttpResponse;
+import codesquad.http.exception.HttpStatusException;
+import codesquad.http.status.HttpStatus;
 
 public class HttpStaticHandler {
 
@@ -36,7 +41,7 @@ public class HttpStaticHandler {
 	);
 
 	public HttpResponse handle(HttpRequest httpRequest) {
-		String url = httpRequest.getUrl();
+		String url = httpRequest.url();
 		String path = urlMapping.getOrDefault(url, url);
 		File file = new File(STATIC_ROOT_PATH + path);
 
@@ -45,7 +50,7 @@ public class HttpStaticHandler {
 		}
 
 		try (FileInputStream fileInputStream = new FileInputStream(file)) {
-			String version = httpRequest.getVersion();
+			String version = httpRequest.version();
 
 			String extension = file.getName().substring(file.getName().lastIndexOf(".") + 1);
 			String mimeType = MIME_TYPES.getOrDefault(extension, "application/octet-stream");
