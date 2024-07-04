@@ -5,9 +5,14 @@ import java.net.ServerSocket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import codesquad.http.HttpProcessor;
 
 public class WebServer {
+
+	private final Logger logger = LoggerFactory.getLogger(WebServer.class);
 
 	private final int PORT;
 	private final int BACKLOG;
@@ -15,21 +20,26 @@ public class WebServer {
 
 	private boolean running;
 
-	public WebServer(int port, int backlog, int threadPoolSize) throws IOException {
+	public WebServer(int port, int backlog, int threadPoolSize) {
 		this.PORT = port;
 		this.BACKLOG = backlog;
 		this.THREAD_POOL_SIZE = threadPoolSize;
 	}
 
-	public void start() throws IOException {
-		running = true;
-		ExecutorService threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
-		try(ServerSocket serverSocket = new ServerSocket(PORT, BACKLOG)){
-			while (running) {
-				threadPool.submit(new HttpProcessor(serverSocket.accept()));
+	public void start() {
+		try {
+			running = true;
+			ExecutorService threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+			try (ServerSocket serverSocket = new ServerSocket(PORT, BACKLOG)) {
+				while (running) {
+					threadPool.submit(new HttpProcessor(serverSocket.accept()));
+				}
 			}
+			threadPool.shutdown();
+		} catch (IOException e) {
+			logger.error("서버가 비정상적으로 종료되었습니다.");
+			logger.error(e.getMessage(), e);
 		}
-		threadPool.shutdown();
 	}
 
 	public void stop() {
