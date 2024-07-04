@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,17 +29,25 @@ public class HttpProcessor implements Runnable {
 			// 클라이언트 연결 로그 출력
 			logger.info("Client connected");
 
-			// HTTP Request
-			HttpRequest httpRequest = HttpRequestParser.parse(clientInputReader);
-			logger.debug(httpRequest.toString());
+			try {
+				// HTTP Request
+				HttpRequest httpRequest = HttpRequestParser.parse(clientInputReader);
+				logger.debug(httpRequest.toString());
 
-			// HTTP Response
-			HttpResponse httpResponse = httpHandler.handle(httpRequest);
-			clientOutput.write(httpResponse.toString().getBytes());
+				// HTTP Response
+				HttpResponse httpResponse = httpHandler.handle(httpRequest);
+				clientOutput.write(httpResponse.toString().getBytes());
+
+			} catch (HttpStatusException e) {
+				logger.error("HTTP 상태 코드 예외 발생: " + e.getStatus().getCode() + " " + e.getMessage());
+				HttpResponse errorResponse = new HttpResponse("HTTP/1.1", e.getStatus().getCode(), e.getStatus().getReasonPhrase(), Map.of(), e.getStatus().getReasonPhrase());
+				clientOutput.write(errorResponse.toString().getBytes());
+			}
 
 			// write flush
 			clientOutput.flush();
-		} catch (IOException | IllegalArgumentException e) {
+		} catch (IOException e) {
+			logger.error("클라이언트 소켓의 write 또는 flush 에 실패했습니다.");
 			logger.error(e.getMessage());
 		}
 	}

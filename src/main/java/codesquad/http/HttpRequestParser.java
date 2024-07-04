@@ -14,12 +14,12 @@ public class HttpRequestParser {
 		String requestLine = reader.readLine();
 
 		if (requestLine == null || requestLine.isEmpty()) {
-			throw new IllegalArgumentException("요청 라인이 비어있습니다.");
+			throw new HttpStatusException(HttpStatus.BAD_REQUEST, "요청 라인이 비어있습니다.");
 		}
 
 		String[] requestLineParts = requestLine.split(" ");
 		if (requestLineParts.length != 3) {
-			throw new IllegalArgumentException("요청 라인 형식이 잘못되었습니다.");
+			throw new HttpStatusException(HttpStatus.BAD_REQUEST, "요청 라인 형식이 잘못되었습니다.");
 		}
 
 		requestLineMap.put("method", requestLineParts[0]);
@@ -32,14 +32,14 @@ public class HttpRequestParser {
 			int index = headerLine.indexOf(":");
 
 			if (index == -1) {
-				throw new IllegalArgumentException("헤더 라인 형식이 잘못되었습니다.");
+				throw new HttpStatusException(HttpStatus.BAD_REQUEST, "헤더 라인 형식이 잘못되었습니다.");
 			}
 
 			String key = headerLine.substring(0, index).trim();
 			String value = headerLine.substring(index + 1).trim();
 
 			if (key.isEmpty() || value.isEmpty()) {
-				throw new IllegalArgumentException("헤더 키 또는 밸류가 비어있습니다.");
+				throw new HttpStatusException(HttpStatus.BAD_REQUEST, "헤더 키 또는 밸류가 비어있습니다.");
 			}
 
 			String[] values = value.split(",");
