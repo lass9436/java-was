@@ -2,6 +2,8 @@ package codesquad.http.parser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,9 +82,12 @@ public class HttpRequestParser {
 		for (String pair : pairs) {
 			String[] keyValue = pair.split("=");
 			if (keyValue.length == 2) {
-				queryParams.computeIfAbsent(keyValue[0], k -> new ArrayList<>()).add(keyValue[1]);
+				String key = URLDecoder.decode(keyValue[0], StandardCharsets.UTF_8);
+				String value = URLDecoder.decode(keyValue[1], StandardCharsets.UTF_8);
+				queryParams.computeIfAbsent(key, k -> new ArrayList<>()).add(value);
 			} else if (keyValue.length == 1) {
-				queryParams.computeIfAbsent(keyValue[0], k -> new ArrayList<>()).add("");
+				String key = URLDecoder.decode(keyValue[0], StandardCharsets.UTF_8);
+				queryParams.computeIfAbsent(key, k -> new ArrayList<>()).add("");
 			}
 		}
 		return queryParams;
