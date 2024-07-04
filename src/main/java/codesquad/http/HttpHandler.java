@@ -33,7 +33,7 @@ public class HttpHandler {
 		"/registration", "/registration/index.html"
 	);
 
-	public HttpResponse handle(HttpRequest httpRequest) throws IOException {
+	public HttpResponse handle(HttpRequest httpRequest) {
 		String url = httpRequest.getUrl();
 		String path = urlMapping.getOrDefault(url, url);
 		File file = new File(STATIC_ROOT_PATH + path);
@@ -57,8 +57,9 @@ public class HttpHandler {
 			if (bytesRead != body.length) {
 				throw new HttpStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일을 정상적으로 읽지 못했습니다.");
 			}
-
 			return new HttpResponse(version, HttpStatus.OK, headers, body);
+		} catch (IOException e) {
+			throw new HttpStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일을 정상적으로 읽지 못했습니다.");
 		}
 	}
 }
