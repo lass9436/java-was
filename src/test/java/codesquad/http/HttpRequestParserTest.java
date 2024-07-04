@@ -17,7 +17,7 @@ class HttpRequestParserTest {
 		String httpRequestString = "\r\n";
 
 		BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+		Exception exception = assertThrows(HttpStatusException.class, () -> {
 			HttpRequestParser.parse(reader);
 		});
 
@@ -29,7 +29,7 @@ class HttpRequestParserTest {
 		String httpRequestString = "GET /index.html\r\n";  // 잘못된 형식
 
 		BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+		Exception exception = assertThrows(HttpStatusException.class, () -> {
 			HttpRequestParser.parse(reader);
 		});
 
@@ -45,7 +45,7 @@ class HttpRequestParserTest {
 			"\r\n";
 
 		BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+		Exception exception = assertThrows(HttpStatusException.class, () -> {
 			HttpRequestParser.parse(reader);
 		});
 
@@ -61,7 +61,7 @@ class HttpRequestParserTest {
 			"\r\n";
 
 		BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+		Exception exception = assertThrows(HttpStatusException.class, () -> {
 			HttpRequestParser.parse(reader);
 		});
 

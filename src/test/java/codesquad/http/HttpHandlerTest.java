@@ -44,6 +44,6 @@ class HttpHandlerTest {
 			assertTrue(httpResponse.getHeaders().containsKey("Content-Type"));
 			assertEquals(expectedContentType, httpResponse.getHeaders().get("Content-Type").get(0));
 		}
-		assertFalse(httpResponse.getBody().isEmpty());
+		assertTrue(httpResponse.getBody().length > 0);
 	}
 }
