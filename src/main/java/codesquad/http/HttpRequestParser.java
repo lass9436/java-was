@@ -1,4 +1,4 @@
-package codesquad.httpRequest;
+package codesquad.http;
 
 import java.io.BufferedReader;
 import java.io.IOException;

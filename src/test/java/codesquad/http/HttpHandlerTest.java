@@ -1,4 +1,4 @@
-package codesquad.httpHandler;
+package codesquad.http;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -9,9 +9,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import codesquad.httpRequest.HttpRequest;
-import codesquad.httpResponse.HttpResponse;
 
 @DisplayName("HttpHandler 테스트")
 class HttpHandlerTest {

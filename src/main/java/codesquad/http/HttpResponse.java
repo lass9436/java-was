@@ -1,4 +1,4 @@
-package codesquad.httpResponse;
+package codesquad.http;
 
 import java.util.List;
 import java.util.Map;

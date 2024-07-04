@@ -1,4 +1,4 @@
-package codesquad.httpRequest;
+package codesquad.http;
 
 import static org.junit.jupiter.api.Assertions.*;
 
