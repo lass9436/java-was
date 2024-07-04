@@ -10,8 +10,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import codesquad.http.dto.HttpRequest;
-import codesquad.http.exception.HttpStatusException;
 import codesquad.http.parser.HttpRequestParser;
+import codesquad.http.status.HttpStatusException;
 
 @DisplayName("HttpRequestParser 테스트")
 class HttpRequestParserTest {

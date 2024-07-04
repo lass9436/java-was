@@ -1,6 +1,4 @@
-package codesquad.http.exception;
-
-import codesquad.http.status.HttpStatus;
+package codesquad.http.status;
 
 public class HttpStatusException extends RuntimeException {
 

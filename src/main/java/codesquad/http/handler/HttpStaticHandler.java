@@ -14,8 +14,8 @@ import com.sun.net.httpserver.HttpHandler;
 
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
-import codesquad.http.exception.HttpStatusException;
 import codesquad.http.status.HttpStatus;
+import codesquad.http.status.HttpStatusException;
 
 public class HttpStaticHandler {
 

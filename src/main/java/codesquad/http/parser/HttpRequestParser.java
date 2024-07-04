@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import codesquad.http.dto.HttpRequest;
-import codesquad.http.exception.HttpStatusException;
 import codesquad.http.status.HttpStatus;
+import codesquad.http.status.HttpStatusException;
 
 public class HttpRequestParser {
 

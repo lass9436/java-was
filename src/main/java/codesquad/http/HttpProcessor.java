@@ -12,10 +12,10 @@ import org.slf4j.LoggerFactory;
 
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
-import codesquad.http.exception.HttpStatusException;
 import codesquad.http.handler.HttpDynamicHandler;
 import codesquad.http.handler.HttpStaticHandler;
 import codesquad.http.parser.HttpRequestParser;
+import codesquad.http.status.HttpStatusException;
 
 public class HttpProcessor implements Runnable {
 
