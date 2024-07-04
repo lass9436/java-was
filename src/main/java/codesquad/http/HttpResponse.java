@@ -9,17 +9,39 @@ public class HttpResponse {
 	private final String version;
 	private final int statusCode;
 	private final String statusMessage;
-
 	private final Map<String, List<String>> headers;
-	private final String body;
+	private final byte[] body;
 
 	public HttpResponse(String version, int statusCode, String statusMessage, Map<String, List<String>> headers,
-		String body) {
+		byte[] body) {
 		this.version = version;
 		this.statusCode = statusCode;
 		this.statusMessage = statusMessage;
 		this.headers = headers;
 		this.body = body;
+	}
+
+	public byte[] getBytes() {
+		StringBuilder response = new StringBuilder();
+		response.append(version).append(" ").append(statusCode).append(" ").append(statusMessage).append("\r\n");
+
+		for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+			StringJoiner valuesJoiner = new StringJoiner(", ");
+			for (String value : entry.getValue()) {
+				valuesJoiner.add(value);
+			}
+			response.append(entry.getKey()).append(": ").append(valuesJoiner).append("\r\n");
+		}
+
+		response.append("\r\n");
+
+		byte[] headerBytes = response.toString().getBytes();
+		byte[] responseBytes = new byte[headerBytes.length + body.length];
+
+		System.arraycopy(headerBytes, 0, responseBytes, 0, headerBytes.length);
+		System.arraycopy(body, 0, responseBytes, headerBytes.length, body.length);
+
+		return responseBytes;
 	}
 
 	public String getVersion() {
@@ -38,27 +60,7 @@ public class HttpResponse {
 		return headers;
 	}
 
-	public String getBody() {
+	public byte[] getBody() {
 		return body;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder response = new StringBuilder();
-		response.append(version).append(" ").append(statusCode).append(" ").append(statusMessage).append("\r\n");
-
-		for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
-			StringJoiner valuesJoiner = new StringJoiner(", ");
-			for (String value : entry.getValue()) {
-				valuesJoiner.add(value);
-			}
-			response.append(entry.getKey()).append(": ").append(valuesJoiner).append("\r\n");
-		}
-
-		response.append("\r\n");
-		response.append(body);
-		response.append("\r\n");
-
-		return response.toString();
 	}
 }
