@@ -12,11 +12,11 @@ public class HttpResponse {
 	private final Map<String, List<String>> headers;
 	private final byte[] body;
 
-	public HttpResponse(String version, int statusCode, String statusMessage, Map<String, List<String>> headers,
+	public HttpResponse(String version, HttpStatus httpStatus, Map<String, List<String>> headers,
 		byte[] body) {
 		this.version = version;
-		this.statusCode = statusCode;
-		this.statusMessage = statusMessage;
+		this.statusCode = httpStatus.getCode();
+		this.statusMessage = httpStatus.getReasonPhrase();
 		this.headers = headers;
 		this.body = body;
 	}

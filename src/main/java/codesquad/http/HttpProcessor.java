@@ -36,12 +36,12 @@ public class HttpProcessor implements Runnable {
 
 				// HTTP Response
 				HttpResponse httpResponse = httpHandler.handle(httpRequest);
-				clientOutput.write(httpResponse.toString().getBytes());
+				clientOutput.write(httpResponse.getBytes());
 
 			} catch (HttpStatusException e) {
 				logger.error("HTTP 상태 코드 예외 발생: " + e.getStatus().getCode() + " " + e.getMessage());
-				HttpResponse errorResponse = new HttpResponse("HTTP/1.1", e.getStatus().getCode(), e.getStatus().getReasonPhrase(), Map.of(), e.getStatus().getReasonPhrase());
-				clientOutput.write(errorResponse.toString().getBytes());
+				HttpResponse errorResponse = new HttpResponse("HTTP/1.1", e.getStatus(), Map.of(), e.getStatus().getReasonPhrase().getBytes());
+				clientOutput.write(errorResponse.getBytes());
 			}
 
 			// write flush
