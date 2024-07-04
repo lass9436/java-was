@@ -10,7 +10,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HttpHandler {
+import com.sun.net.httpserver.HttpHandler;
+
+public class HttpStaticHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(HttpHandler.class);
 	private static final String STATIC_ROOT_PATH = "src/main/resources/static/";
