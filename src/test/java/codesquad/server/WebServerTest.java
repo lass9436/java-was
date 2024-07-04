@@ -41,10 +41,7 @@ class WebServerTest {
 		static void setUp() throws IOException {
 			webServer = new WebServer(PORT, BACKLOG, THREAD_POOL_SIZE);
 			new Thread(() -> {
-				try {
-					webServer.start();
-				} catch (IOException ignored) {
-				}
+				webServer.start();
 			}).start();
 		}
 
@@ -109,10 +106,7 @@ class WebServerTest {
 		static void setUp() throws IOException {
 			webServer = new WebServer(PORT, BACKLOG, THREAD_POOL_SIZE);
 			new Thread(() -> {
-				try {
-					webServer.start();
-				} catch (IOException ignored) {
-				}
+				webServer.start();
 			}).start();
 		}
 
