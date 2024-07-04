@@ -32,7 +32,6 @@ class HttpHandlerTest {
 		"'/global.css', 200, 'text/css'",
 		"'/img/like.svg', 200, 'image/svg+xml'",
 		"'/favicon.ico', 200, 'image/x-icon'",
-		"'/nonexistent.html', 404, ''"
 	})
 	void url에_따라_정적_리소스를_반환한다(String url, int expectedStatusCode, String expectedContentType) throws IOException {
 		HttpRequest httpRequest = new HttpRequest("GET", url, "HTTP/1.1", null);

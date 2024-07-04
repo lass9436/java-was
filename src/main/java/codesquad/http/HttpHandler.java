@@ -1,8 +1,7 @@
 package codesquad.http;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -40,26 +39,26 @@ public class HttpHandler {
 		File file = new File(STATIC_ROOT_PATH + path);
 
 		if (!file.exists() || file.isDirectory()) {
-			return new HttpResponse(httpRequest.getVersion(), 404, "Not Found", Map.of(), "<h1>404 Not Found</h1>");
+			throw new HttpStatusException(HttpStatus.NOT_FOUND, "File not found");
 		}
 
-		BufferedReader fileReader = new BufferedReader(new FileReader(file));
-		String version = httpRequest.getVersion();
-		int statusCode = 200;
-		String statusMessage = "OK";
+		try (FileInputStream fileInputStream = new FileInputStream(file)) {
+			String version = httpRequest.getVersion();
 
-		String extension = file.getName().substring(file.getName().lastIndexOf(".") + 1);
-		String mimeType = MIME_TYPES.get(extension);
+			String extension = file.getName().substring(file.getName().lastIndexOf(".") + 1);
+			String mimeType = MIME_TYPES.getOrDefault(extension, "application/octet-stream");
 
-		Map<String, List<String>> headers = new HashMap<>();
-		headers.put("Content-Type", List.of(mimeType));
+			Map<String, List<String>> headers = new HashMap<>();
+			headers.put("Content-Type", List.of(mimeType));
+			headers.put("Content-Length", List.of(String.valueOf(file.length())));
 
-		StringBuilder body = new StringBuilder();
-		String line = null;
-		while ((line = fileReader.readLine()) != null) {
-			body.append(line).append("\r\n");
+			byte[] body = new byte[(int)file.length()];
+			int bytesRead = fileInputStream.read(body);
+			if (bytesRead != body.length) {
+				throw new HttpStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일을 정상적으로 읽지 못했습니다.");
+			}
+
+			return new HttpResponse(version, HttpStatus.OK, headers, body);
 		}
-
-		return new HttpResponse(version, statusCode, statusMessage, headers, body.toString());
 	}
 }
