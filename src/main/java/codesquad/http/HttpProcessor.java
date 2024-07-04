@@ -1,4 +1,4 @@
-package codesquad.runnable;
+package codesquad.http;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,20 +9,15 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import codesquad.httpHandler.HttpHandler;
-import codesquad.httpRequest.HttpRequest;
-import codesquad.httpRequest.HttpRequestParser;
-import codesquad.httpResponse.HttpResponse;
+public class HttpProcessor implements Runnable {
 
-public class MyRunnable implements Runnable {
-
-	private static final Logger logger = LoggerFactory.getLogger(MyRunnable.class);
+	private static final Logger logger = LoggerFactory.getLogger(HttpProcessor.class);
 
 	private final Socket socket;
 
 	private final HttpHandler httpHandler = new HttpHandler();
 
-	public MyRunnable(Socket clientSocket) {
+	public HttpProcessor(Socket clientSocket) {
 		socket = clientSocket;
 	}
 

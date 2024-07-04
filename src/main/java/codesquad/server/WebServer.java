@@ -5,7 +5,7 @@ import java.net.ServerSocket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import codesquad.runnable.MyRunnable;
+import codesquad.http.HttpProcessor;
 
 public class WebServer {
 
@@ -26,7 +26,7 @@ public class WebServer {
 		ExecutorService threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 		try(ServerSocket serverSocket = new ServerSocket(PORT, BACKLOG)){
 			while (running) {
-				threadPool.submit(new MyRunnable(serverSocket.accept()));
+				threadPool.submit(new HttpProcessor(serverSocket.accept()));
 			}
 		}
 		threadPool.shutdown();
