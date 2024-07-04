@@ -4,21 +4,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-public class HttpResponse {
+public record HttpResponse(String version, int statusCode, String statusMessage, Map<String, List<String>> headers,
+						   byte[] body) {
 
-	private final String version;
-	private final int statusCode;
-	private final String statusMessage;
-	private final Map<String, List<String>> headers;
-	private final byte[] body;
-
-	public HttpResponse(String version, HttpStatus httpStatus, Map<String, List<String>> headers,
-		byte[] body) {
-		this.version = version;
-		this.statusCode = httpStatus.getCode();
-		this.statusMessage = httpStatus.getReasonPhrase();
-		this.headers = headers;
-		this.body = body;
+	public HttpResponse(String version, HttpStatus httpStatus, Map<String, List<String>> headers, byte[] body) {
+		this(version, httpStatus.getCode(), httpStatus.getReasonPhrase(), headers, body);
 	}
 
 	public byte[] getBytes() {
@@ -42,25 +32,5 @@ public class HttpResponse {
 		System.arraycopy(body, 0, responseBytes, headerBytes.length, body.length);
 
 		return responseBytes;
-	}
-
-	public String getVersion() {
-		return version;
-	}
-
-	public int getStatusCode() {
-		return statusCode;
-	}
-
-	public String getStatusMessage() {
-		return statusMessage;
-	}
-
-	public Map<String, List<String>> getHeaders() {
-		return headers;
-	}
-
-	public byte[] getBody() {
-		return body;
 	}
 }
