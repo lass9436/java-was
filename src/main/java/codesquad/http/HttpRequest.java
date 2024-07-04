@@ -10,12 +10,15 @@ public class HttpRequest {
 	private final String url;
 	private final String version;
 	private final Map<String, List<String>> headers;
+	private final Map<String, List<String>> parameters;
 
-	public HttpRequest(String method, String url, String version, Map<String, List<String>> headers) {
+	public HttpRequest(String method, String url, String version, Map<String, List<String>> headers,
+		Map<String, List<String>> parameters) {
 		this.method = method;
 		this.url = url;
 		this.version = version;
 		this.headers = headers;
+		this.parameters = parameters;
 	}
 
 	public String getMethod() {
@@ -32,6 +35,10 @@ public class HttpRequest {
 
 	public Map<String, List<String>> getHeaders() {
 		return headers;
+	}
+
+	public Map<String, List<String>> getParameters() {
+		return parameters;
 	}
 
 	@Override
