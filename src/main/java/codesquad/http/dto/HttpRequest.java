@@ -1,38 +1,11 @@
-package codesquad.httpRequest;
+package codesquad.http.dto;
 
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-public class HttpRequest {
-
-	private final String method;
-	private final String url;
-	private final String version;
-	private final Map<String, List<String>> headers;
-
-	public HttpRequest(String method, String url, String version, Map<String, List<String>> headers) {
-		this.method = method;
-		this.url = url;
-		this.version = version;
-		this.headers = headers;
-	}
-
-	public String getMethod() {
-		return method;
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public String getVersion() {
-		return version;
-	}
-
-	public Map<String, List<String>> getHeaders() {
-		return headers;
-	}
+public record HttpRequest(String method, String url, String version, Map<String, List<String>> headers,
+						  Map<String, List<String>> parameters) {
 
 	@Override
 	public String toString() {
