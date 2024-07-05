@@ -1,9 +1,11 @@
 package codesquad.http.parser;
 
+import static codesquad.StringUtils.Constants.*;
+
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -81,13 +83,17 @@ public class HttpRequestParser {
 		String[] pairs = queryString.split("&");
 		for (String pair : pairs) {
 			String[] keyValue = pair.split("=");
-			if (keyValue.length == 2) {
-				String key = URLDecoder.decode(keyValue[0], StandardCharsets.UTF_8);
-				String value = URLDecoder.decode(keyValue[1], StandardCharsets.UTF_8);
-				queryParams.computeIfAbsent(key, k -> new ArrayList<>()).add(value);
-			} else if (keyValue.length == 1) {
-				String key = URLDecoder.decode(keyValue[0], StandardCharsets.UTF_8);
-				queryParams.computeIfAbsent(key, k -> new ArrayList<>()).add("");
+			try {
+				if (keyValue.length == 2) {
+					String key = URLDecoder.decode(keyValue[0], UTF8);
+					String value = URLDecoder.decode(keyValue[1], UTF8);
+					queryParams.computeIfAbsent(key, k -> new ArrayList<>()).add(value);
+				} else if (keyValue.length == 1) {
+					String key = URLDecoder.decode(keyValue[0], UTF8);
+					queryParams.computeIfAbsent(key, k -> new ArrayList<>()).add("");
+				}
+			} catch (UnsupportedEncodingException e) {
+				throw new HttpStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "URL 쿼리 파라미터 파싱에 실패했습니다.");
 			}
 		}
 		return queryParams;

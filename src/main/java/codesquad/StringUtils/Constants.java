@@ -8,4 +8,5 @@ public class Constants {
 	public static final String CARRIAGE_RETURN = "\r";
 	public static final String COLON_SPACE = ": ";
 	public static final String COMMA_SPACE = ", ";
+	public static final String UTF8 = "UTF-8";
 }
