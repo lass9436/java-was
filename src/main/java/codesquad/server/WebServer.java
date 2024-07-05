@@ -30,6 +30,7 @@ public class WebServer {
 		try {
 			running = true;
 			ExecutorService threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+			logger.info("Starting web server on port {}", PORT);
 			try (ServerSocket serverSocket = new ServerSocket(PORT, BACKLOG)) {
 				while (running) {
 					threadPool.submit(new HttpProcessor(serverSocket.accept()));
