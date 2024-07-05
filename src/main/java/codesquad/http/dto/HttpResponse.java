@@ -1,5 +1,7 @@
 package codesquad.http.dto;
 
+import static codesquad.StringUtils.Constants.*;
+
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -15,17 +17,17 @@ public record HttpResponse(String version, int statusCode, String statusMessage,
 
 	public byte[] getBytes() {
 		StringBuilder response = new StringBuilder();
-		response.append(version).append(" ").append(statusCode).append(" ").append(statusMessage).append("\r\n");
+		response.append(version).append(SPACE).append(statusCode).append(SPACE).append(statusMessage).append(CRLF);
 
 		for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
-			StringJoiner valuesJoiner = new StringJoiner(", ");
+			StringJoiner valuesJoiner = new StringJoiner(COMMA_SPACE);
 			for (String value : entry.getValue()) {
 				valuesJoiner.add(value);
 			}
-			response.append(entry.getKey()).append(": ").append(valuesJoiner).append("\r\n");
+			response.append(entry.getKey()).append(COLON_SPACE).append(valuesJoiner).append(CRLF);
 		}
 
-		response.append("\r\n");
+		response.append(CRLF);
 
 		byte[] headerBytes = response.toString().getBytes();
 		byte[] responseBytes = new byte[headerBytes.length + body.length];
