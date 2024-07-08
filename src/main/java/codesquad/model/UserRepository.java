@@ -1,5 +1,7 @@
 package codesquad.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -38,6 +40,10 @@ public class UserRepository {
 			throw new HttpStatusException(HttpStatus.NOT_FOUND, "User with id " + userId + " does not exist");
 		}
 		users.remove(userId);
+	}
+
+	public List<User> findAll() {
+		return new ArrayList<>(users.values());
 	}
 
 }
