@@ -4,15 +4,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 public record HttpRequest(String method, String path, String version, Map<String, List<String>> headers,
-						  Map<String, List<String>> parameters, JsonNode body) {
+						  Map<String, List<String>> parameters, Map<String, List<String>> body) {
 
 	@Override
 	public String toString() {
 		String headersString = mapToString(headers);
 		String parametersString = mapToString(parameters);
+		String bodyString = mapToString(body);
 
 		return "HttpRequest{" +
 			"method='" + method + '\'' +
@@ -20,7 +19,7 @@ public record HttpRequest(String method, String path, String version, Map<String
 			", version='" + version + '\'' +
 			", headers=" + headersString +
 			", parameters=" + parametersString +
-			", body=" + body.toString() +
+			", body=" + bodyString +
 			'}';
 	}
 
