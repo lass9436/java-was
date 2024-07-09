@@ -12,12 +12,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.parser.HttpRequestParser;
 import codesquad.http.status.HttpStatusException;
 
 @DisplayName("HttpRequestParser 테스트")
 class HttpRequestParserTest {
+
+	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Nested
 	class 요청_라인과_헤더를_테스트 {
@@ -92,7 +97,7 @@ class HttpRequestParserTest {
 			HttpRequest httpRequest = HttpRequestParser.parse(reader);
 
 			assertEquals("GET", httpRequest.method());
-			assertEquals("/index.html", httpRequest.url());
+			assertEquals("/index.html", httpRequest.path());
 			assertEquals("HTTP/1.1", httpRequest.version());
 			assertEquals("localhost:8080", httpRequest.headers().get("Host").get(0));
 			assertEquals("keep-alive", httpRequest.headers().get("Connection").get(0));
@@ -102,6 +107,42 @@ class HttpRequestParserTest {
 			assertTrue(httpRequest.headers().get("Accept").contains("image/webp"));
 			assertTrue(httpRequest.headers().get("Accept").contains("image/apng"));
 			assertTrue(httpRequest.headers().get("Accept").contains("*/*;q=0.8"));
+		}
+	}
+
+	@Nested
+	class 요청_라인과_헤더와_바디를_테스트 {
+
+		@Test
+		void 요청_라인과_헤더와_바디를_파싱한다() throws IOException {
+			String jsonBody = "{\"name\":\"John\",\"age\":30,\"email\":\"john@email.com\"}";
+			byte[] jsonBodyBytes = jsonBody.getBytes("UTF-8");
+			String httpRequestString =
+				"POST /submit HTTP/1.1\r\n" +
+					"Host: localhost:8080\r\n" +
+					"Connection: keep-alive\r\n" +
+					"Content-Type: application/json\r\n" +
+					"Content-Length: " + jsonBodyBytes.length + "\r\n" +
+					"\r\n" +
+					jsonBody;
+
+			BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
+			HttpRequest httpRequest = HttpRequestParser.parse(reader);
+
+			// 요청 라인 검증
+			assertEquals("POST", httpRequest.method());
+			assertEquals("/submit", httpRequest.path());
+			assertEquals("HTTP/1.1", httpRequest.version());
+
+			// 헤더 검증
+			assertEquals("localhost:8080", httpRequest.headers().get("Host").get(0));
+			assertEquals("keep-alive", httpRequest.headers().get("Connection").get(0));
+			assertEquals("application/json", httpRequest.headers().get("Content-Type").get(0));
+			assertEquals(jsonBodyBytes.length + "", httpRequest.headers().get("Content-Length").get(0));
+
+			// 바디 검증
+			JsonNode expectedBody = objectMapper.readTree(jsonBody);
+			assertEquals(expectedBody, httpRequest.body());
 		}
 	}
 
