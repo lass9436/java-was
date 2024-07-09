@@ -1,6 +1,6 @@
-package codesquad.StringUtils;
+package codesquad.utils;
 
-public class Constants {
+public class StringConstants {
 	public static final String CRLF = "\r\n";
 	public static final String SPACE = " ";
 	public static final String TAB = "\t";
