@@ -14,7 +14,7 @@ public class UserRepository {
 
 	public User create(User user) {
 		if(users.containsKey(user.userId())){
-			throw new HttpStatusException(HttpStatus.BAD_REQUEST, "User with id " + user.userId() + " already exists");
+			throw new IllegalArgumentException("User with id " + user.userId() + " already exists");
 		}
 		users.put(user.userId(), user);
 		return user;
@@ -22,14 +22,14 @@ public class UserRepository {
 
 	public User findById(String userId) {
 		if(!users.containsKey(userId)){
-			throw new HttpStatusException(HttpStatus.NOT_FOUND, "User with id " + userId + " does not exist");
+			throw new IllegalArgumentException("User with id " + userId + " does not exist");
 		}
 		return users.get(userId);
 	}
 
 	public User update(User user) {
 		if(!users.containsKey(user.userId())){
-			throw new HttpStatusException(HttpStatus.NOT_FOUND, "User with id " + user.userId() + " does not exist");
+			throw new IllegalArgumentException("User with id " + user.userId() + " does not exist");
 		}
 		users.put(user.userId(), user);
 		return user;
@@ -37,7 +37,7 @@ public class UserRepository {
 
 	public void delete(String userId) {
 		if(!users.containsKey(userId)){
-			throw new HttpStatusException(HttpStatus.NOT_FOUND, "User with id " + userId + " does not exist");
+			throw new IllegalArgumentException("User with id " + userId + " does not exist");
 		}
 		users.remove(userId);
 	}
