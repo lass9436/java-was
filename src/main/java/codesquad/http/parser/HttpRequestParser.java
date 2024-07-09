@@ -11,18 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.status.HttpStatus;
 import codesquad.http.status.HttpStatusException;
 
 public class HttpRequestParser {
-
-	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	public static HttpRequest parse(BufferedReader reader) throws IOException {
 		String requestLine = reader.readLine();
@@ -34,7 +27,7 @@ public class HttpRequestParser {
 
 		Map<String, List<String>> queryParams = parseQueryParams(queryString);
 		Map<String, List<String>> headers = parseHeaders(reader);
-		JsonNode body = parseRequestBody(reader, headers);
+		Map<String, List<String>> body = parseRequestBody(reader, headers);
 
 		return new HttpRequest(
 			requestLineMap.get("method"),
@@ -138,58 +131,28 @@ public class HttpRequestParser {
 		queryParams.computeIfAbsent(decodedKey, k -> new ArrayList<>()).add(decodedValue);
 	}
 
-	private static JsonNode parseRequestBody(BufferedReader reader, Map<String, List<String>> headers) throws IOException {
+	private static Map<String, List<String>> parseRequestBody(BufferedReader reader,
+		Map<String, List<String>> headers) throws IOException {
 		int contentLength = getContentLength(headers);
 		if (contentLength == -1) {
-			return objectMapper.createObjectNode();  // 빈 JSON 객체를 반환합니다.
+			return Map.of();  // 빈 JSON 객체를 반환합니다.
 		}
 
 		String contentType = headers.getOrDefault("Content-Type", List.of("")).get(0);
 		String body = readBody(reader, contentLength);
 		if (body == null) {
-			return objectMapper.createObjectNode();  // 빈 JSON 객체를 반환합니다.
+			return Map.of();
 		}
 
 		if (contentType.equals("application/x-www-form-urlencoded")) {
 			return parseFormUrlEncodedBody(body);
 		}
 		if (contentType.equals("application/json")) {
-			return objectMapper.readTree(body);
+			return parseJsonBody(body);
 		}
 
-		return objectMapper.createObjectNode();  // 빈 JSON 객체를 반환합니다.
+		return Map.of();  // 빈 JSON 객체를 반환합니다.
 	}
-
-	private static JsonNode parseFormUrlEncodedBody(String body) throws IOException {
-		ObjectNode node = objectMapper.createObjectNode();
-		String[] pairs = body.split("&");
-
-		for (String pair : pairs) {
-			String[] keyValue = pair.split("=");
-			if (keyValue.length >= 1) {
-				String key = URLDecoder.decode(keyValue[0], UTF8);
-				String value = keyValue.length == 2 ? URLDecoder.decode(keyValue[1], UTF8) : "";
-
-				if (node.has(key)) {
-					// 키가 이미 있다면 필요할 경우 ArrayNode 를 생성합니다.
-					JsonNode existingNode = node.get(key);
-					ArrayNode arrayNode;
-					if (existingNode.isArray()) {
-						arrayNode = (ArrayNode) existingNode;
-					} else {
-						arrayNode = objectMapper.createArrayNode();
-						arrayNode.add(existingNode.asText());
-					}
-					arrayNode.add(value);
-					node.set(key, arrayNode);
-				} else {
-					node.put(key, value);
-				}
-			}
-		}
-		return node;
-	}
-
 
 	private static int getContentLength(Map<String, List<String>> headers) {
 		List<String> contentLengthHeaders = headers.get("Content-Length");
@@ -210,7 +173,8 @@ public class HttpRequestParser {
 		int totalRead = 0;
 		int bytesRead;
 
-		while (totalRead < contentLength && (bytesRead = reader.read(buffer, 0, Math.min(buffer.length, contentLength - totalRead))) != -1) {
+		while (totalRead < contentLength
+			&& (bytesRead = reader.read(buffer, 0, Math.min(buffer.length, contentLength - totalRead))) != -1) {
 			body.append(buffer, 0, bytesRead);
 			totalRead += bytesRead;
 		}
@@ -221,4 +185,42 @@ public class HttpRequestParser {
 
 		return body.toString();
 	}
+
+	private static Map<String, List<String>> parseFormUrlEncodedBody(String body) throws UnsupportedEncodingException {
+		Map<String, List<String>> result = new HashMap<>();
+		String[] pairs = body.split("&");
+
+		for (String pair : pairs) {
+			String[] keyValue = pair.split("=");
+			String key = URLDecoder.decode(keyValue[0], UTF8);
+			String value = keyValue.length > 1 ? URLDecoder.decode(keyValue[1], UTF8) : "";
+			result.computeIfAbsent(key, k -> new ArrayList<>()).add(value);
+		}
+
+		return result;
+	}
+
+	private static Map<String, List<String>> parseJsonBody(String body) throws IOException {
+		Map<String, List<String>> result = new HashMap<>();
+
+		body = body.trim();
+		if (body.startsWith("{") && body.endsWith("}")) {
+			body = body.substring(1, body.length() - 1).trim();
+		} else {
+			throw new IOException("Invalid JSON format");
+		}
+
+		String[] pairs = body.split(",");
+		for (String pair : pairs) {
+			String[] keyValue = pair.split(":", 2);
+			if (keyValue.length == 2) {
+				String key = keyValue[0].trim().replaceAll("^\"|\"$", "");
+				String value = keyValue[1].trim().replaceAll("^\"|\"$", "");
+				result.computeIfAbsent(key, k -> new ArrayList<>()).add(value);
+			}
+		}
+
+		return result;
+	}
+
 }
