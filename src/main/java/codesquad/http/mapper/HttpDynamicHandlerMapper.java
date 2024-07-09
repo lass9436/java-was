@@ -3,9 +3,6 @@ package codesquad.http.mapper;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import codesquad.http.dto.HttpEndPoint;
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
@@ -22,7 +19,8 @@ public class HttpDynamicHandlerMapper {
 	}
 
 	public HttpResponse handle(HttpRequest httpRequest) {
-		Function<HttpRequest, HttpResponse> handler = handlers.get(new HttpEndPoint(httpRequest.path(), httpRequest.method()));
+		Function<HttpRequest, HttpResponse> handler = handlers.get(
+			new HttpEndPoint(httpRequest.path(), httpRequest.method()));
 		try {
 			return handler != null ? handler.apply(httpRequest) : null;
 		} catch (Exception e) {
