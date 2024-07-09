@@ -16,7 +16,7 @@ public class HttpDynamicHandler {
 	private final Logger logger = LoggerFactory.getLogger(HttpDynamicHandler.class);
 
 	public HttpResponse handle(HttpRequest httpRequest) {
-		if ("/create".equalsIgnoreCase(httpRequest.url())) {
+		if ("/create".equalsIgnoreCase(httpRequest.path())) {
 			Map<String, List<String>> queryParams = httpRequest.parameters();
 			String userId = getFirstValue(queryParams, "userId");
 			String password = getFirstValue(queryParams, "password");

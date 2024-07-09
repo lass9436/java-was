@@ -41,8 +41,8 @@ public class HttpStaticHandler {
 	);
 
 	public HttpResponse handle(HttpRequest httpRequest) {
-		String url = httpRequest.url();
-		String path = urlMapping.getOrDefault(url, url);
+		String path = httpRequest.path();
+		path = urlMapping.getOrDefault(path, path);
 		String resourcePath = STATIC_ROOT_PATH + path;
 
 		try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
