@@ -45,9 +45,13 @@ public class HttpStaticHandlerMapper {
 		path = urlMapping.getOrDefault(path, path);
 		String resourcePath = STATIC_ROOT_PATH + path;
 
+		if (!httpRequest.method().equals("GET")) {
+			throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Invalid HTTP method");
+		}
+
 		try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
 			if (inputStream == null) {
-				throw new HttpStatusException(HttpStatus.NOT_FOUND, "File not found", null);
+				throw new HttpStatusException(HttpStatus.NOT_FOUND, "File not found");
 			}
 
 			byte[] body = readAllBytes(inputStream);
