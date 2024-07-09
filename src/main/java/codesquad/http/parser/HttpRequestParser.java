@@ -13,6 +13,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.status.HttpStatus;
@@ -142,12 +143,37 @@ public class HttpRequestParser {
 			return objectMapper.createObjectNode();  // 빈 JSON 객체를 반환합니다.
 		}
 
+		String contentType = headers.getOrDefault("Content-Type", List.of("")).get(0);
 		String body = readBody(reader, contentLength);
 		if (body == null) {
 			return objectMapper.createObjectNode();  // 빈 JSON 객체를 반환합니다.
 		}
 
-		return objectMapper.readTree(body);
+		if (contentType.equals("application/x-www-form-urlencoded")) {
+			return parseFormUrlEncodedBody(body);
+		}
+		if (contentType.equals("application/json")) {
+			return objectMapper.readTree(body);
+		}
+
+		return objectMapper.createObjectNode();  // 빈 JSON 객체를 반환합니다.
+	}
+
+	private static JsonNode parseFormUrlEncodedBody(String body) throws IOException {
+		ObjectNode node = objectMapper.createObjectNode();
+		String[] pairs = body.split("&");
+		for (String pair : pairs) {
+			String[] keyValue = pair.split("=");
+			if (keyValue.length == 2) {
+				String key = URLDecoder.decode(keyValue[0], UTF8);
+				String value = URLDecoder.decode(keyValue[1], UTF8);
+				node.put(key, value);
+			} else if (keyValue.length == 1) {
+				String key = URLDecoder.decode(keyValue[0], UTF8);
+				node.put(key, "");
+			}
+		}
+		return node;
 	}
 
 	private static int getContentLength(Map<String, List<String>> headers) {
