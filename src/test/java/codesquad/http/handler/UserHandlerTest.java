@@ -1,20 +1,16 @@
 package codesquad.http.handler;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.List;
-import java.util.Map;
+import java.io.BufferedReader;
+import java.io.StringReader;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
+import codesquad.http.parser.HttpRequestParser;
 import codesquad.http.status.HttpStatus;
 import codesquad.model.User;
 import codesquad.model.UserRepository;
@@ -22,28 +18,29 @@ import codesquad.model.UserRepository;
 public class UserHandlerTest {
 
 	private static UserHandler userHandler;
-	private static ObjectMapper objectMapper;
 	private static UserRepository userRepository;
 
 	@BeforeAll
 	public static void setUp() {
 		userHandler = new UserHandler();
-		objectMapper = new ObjectMapper();
 		userRepository = new UserRepository();
 	}
 
 	@Test
 	public void 사용자_생성_성공() throws Exception {
-		String jsonString = "{ \"userId\": \"john_doe\", \"password\": \"password123\", \"name\": \"John Doe\", \"email\": \"john@example.com\" }";
-		JsonNode body = objectMapper.readTree(jsonString);
-		HttpRequest request = new HttpRequest(
-			"POST",
-			"/join",
-			"HTTP/1.1",
-			Map.of(),
-			Map.of(),
-			body
-		);
+		String jsonBody = "{ \"userId\": \"john_doe\", \"password\": \"password123\", \"name\": \"John Doe\", \"email\": \"john@example.com\" }";
+		byte[] jsonBodyBytes = jsonBody.getBytes("UTF-8");
+		String httpRequestString =
+			"POST /join HTTP/1.1\r\n" +
+				"Host: localhost:8080\r\n" +
+				"Connection: keep-alive\r\n" +
+				"Content-Type: application/json\r\n" +
+				"Content-Length: " + jsonBodyBytes.length + "\r\n" +
+				"\r\n" +
+				jsonBody;
+
+		BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
+		HttpRequest request = HttpRequestParser.parse(reader);
 
 		HttpResponse response = userHandler.join(request);
 
@@ -57,5 +54,4 @@ public class UserHandlerTest {
 		assertEquals("John Doe", user.name());
 		assertEquals("john@example.com", user.email());
 	}
-
 }
