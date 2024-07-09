@@ -9,6 +9,8 @@ public class JsonUtils {
 		if (valueNode != null) {
 			if (valueNode.isArray() && !valueNode.isEmpty()) {
 				return valueNode.get(0).asText();
+			} else if (valueNode.isArray() && valueNode.isEmpty()) {
+				return null;
 			} else {
 				return valueNode.asText();
 			}
