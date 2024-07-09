@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.parser.HttpRequestParser;
@@ -142,6 +143,40 @@ class HttpRequestParserTest {
 
 			// 바디 검증
 			JsonNode expectedBody = objectMapper.readTree(jsonBody);
+			assertEquals(expectedBody, httpRequest.body());
+		}
+
+		@Test
+		void 요청_라인과_헤더와_폼_데이터를_파싱한다() throws IOException {
+			String formBody = "name=John&age=30";
+			byte[] formBodyBytes = formBody.getBytes("UTF8");
+			String httpRequestString =
+				"POST /submit HTTP/1.1\r\n" +
+					"Host: localhost:8080\r\n" +
+					"Connection: keep-alive\r\n" +
+					"Content-Type: application/x-www-form-urlencoded\r\n" +
+					"Content-Length: " + formBodyBytes.length + "\r\n" +
+					"\r\n" +
+					formBody;
+
+			BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
+			HttpRequest httpRequest = HttpRequestParser.parse(reader);
+
+			// 요청 라인 검증
+			assertEquals("POST", httpRequest.method());
+			assertEquals("/submit", httpRequest.path());
+			assertEquals("HTTP/1.1", httpRequest.version());
+
+			// 헤더 검증
+			assertEquals("localhost:8080", httpRequest.headers().get("Host").get(0));
+			assertEquals("keep-alive", httpRequest.headers().get("Connection").get(0));
+			assertEquals("application/x-www-form-urlencoded", httpRequest.headers().get("Content-Type").get(0));
+			assertEquals(String.valueOf(formBodyBytes.length), httpRequest.headers().get("Content-Length").get(0));
+
+			// 바디 검증
+			ObjectNode expectedBody = objectMapper.createObjectNode();
+			expectedBody.put("name", "John");
+			expectedBody.put("age", "30");
 			assertEquals(expectedBody, httpRequest.body());
 		}
 	}
