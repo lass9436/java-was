@@ -2,6 +2,7 @@ package codesquad.http.handler;
 
 import static codesquad.utils.JsonUtils.*;
 
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -32,7 +33,7 @@ public class UserHandler {
 		userRepository.create(user);
 
 		logger.info("Creating user: {}", user);
-
-		return new HttpResponse("HTTP/1.1", HttpStatus.OK, Map.of(), new byte[0]);
+		Map<String, List<String>> headers = Map.of("Location", List.of("/index.html"));
+		return new HttpResponse("HTTP/1.1", HttpStatus.FOUND, headers, new byte[0]);
 	}
 }
