@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-public record HttpRequest(String method, String url, String version, Map<String, List<String>> headers,
+public record HttpRequest(String method, String path, String version, Map<String, List<String>> headers,
 						  Map<String, List<String>> parameters) {
 
 	@Override
@@ -19,7 +19,7 @@ public record HttpRequest(String method, String url, String version, Map<String,
 		}
 		return "HttpRequest{" +
 			"method='" + method + '\'' +
-			", url='" + url + '\'' +
+			", path='" + path + '\'' +
 			", version='" + version + '\'' +
 			", headers=" + headersString +
 			'}';

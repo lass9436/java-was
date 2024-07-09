@@ -18,9 +18,26 @@ import codesquad.http.status.HttpStatusException;
 public class HttpRequestParser {
 
 	public static HttpRequest parse(BufferedReader reader) throws IOException {
-		Map<String, String> requestLineMap = new HashMap<>();
 		String requestLine = reader.readLine();
+		Map<String, String> requestLineMap = parseRequestLine(requestLine);
 
+		String url = requestLineMap.get("url");
+		String path = extractPath(url);
+		String queryString = extractQueryString(url);
+
+		Map<String, List<String>> queryParams = parseQueryParams(queryString);
+		Map<String, List<String>> headers = parseHeaders(reader);
+
+		return new HttpRequest(
+			requestLineMap.get("method"),
+			path,
+			requestLineMap.get("version"),
+			headers,
+			queryParams
+		);
+	}
+
+	private static Map<String, String> parseRequestLine(String requestLine) {
 		if (requestLine == null || requestLine.isEmpty()) {
 			throw new HttpStatusException(HttpStatus.BAD_REQUEST, "요청 라인이 비어있습니다.");
 		}
@@ -30,29 +47,36 @@ public class HttpRequestParser {
 			throw new HttpStatusException(HttpStatus.BAD_REQUEST, "요청 라인 형식이 잘못되었습니다.");
 		}
 
-		// URL 파싱
-		String url = requestLineParts[1];
-		String path;
-		String queryString;
+		Map<String, String> requestLineMap = new HashMap<>();
+		requestLineMap.put("method", requestLineParts[0]);
+		requestLineMap.put("url", requestLineParts[1]);
+		requestLineMap.put("version", requestLineParts[2]);
+
+		return requestLineMap;
+	}
+
+	private static String extractPath(String url) {
 		int queryIndex = url.indexOf('?');
 		if (queryIndex == -1) {
-			path = url;
-			queryString = "";
-		} else {
-			path = url.substring(0, queryIndex);
-			queryString = url.substring(queryIndex + 1);
+			return url;
 		}
+		return url.substring(0, queryIndex);
+	}
 
-		requestLineMap.put("method", requestLineParts[0]);
-		requestLineMap.put("url", path);
-		requestLineMap.put("version", requestLineParts[2]);
-		Map<String, List<String>> queryParams = parseQueryParams(queryString);
+	private static String extractQueryString(String url) {
+		int queryIndex = url.indexOf('?');
+		if (queryIndex == -1) {
+			return "";
+		}
+		return url.substring(queryIndex + 1);
+	}
 
+	private static Map<String, List<String>> parseHeaders(BufferedReader reader) throws IOException {
 		Map<String, List<String>> headers = new HashMap<>();
-		String headerLine = null;
+		String headerLine;
+
 		while (!(headerLine = reader.readLine()).isEmpty()) {
 			int index = headerLine.indexOf(":");
-
 			if (index == -1) {
 				throw new HttpStatusException(HttpStatus.BAD_REQUEST, "헤더 라인 형식이 잘못되었습니다.");
 			}
@@ -69,9 +93,7 @@ public class HttpRequestParser {
 				headers.computeIfAbsent(key, k -> new ArrayList<>()).add(val.trim());
 			}
 		}
-
-		return new HttpRequest(requestLineMap.get("method"), requestLineMap.get("url"), requestLineMap.get("version"),
-			headers, queryParams);
+		return headers;
 	}
 
 	public static Map<String, List<String>> parseQueryParams(String queryString) {
