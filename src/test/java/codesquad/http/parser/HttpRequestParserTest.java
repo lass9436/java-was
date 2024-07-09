@@ -1,4 +1,4 @@
-package codesquad.http;
+package codesquad.http.parser;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,7 +18,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import codesquad.http.dto.HttpRequest;
-import codesquad.http.parser.HttpRequestParser;
 import codesquad.http.status.HttpStatusException;
 
 @DisplayName("HttpRequestParser 테스트")

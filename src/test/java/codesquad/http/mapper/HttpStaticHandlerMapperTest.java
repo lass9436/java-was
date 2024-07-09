@@ -1,4 +1,4 @@
-package codesquad.http;
+package codesquad.http.mapper;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -12,7 +12,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
-import codesquad.http.mapper.HttpStaticHandlerMapper;
 
 @DisplayName("HttpStaticHandler 테스트")
 class HttpStaticHandlerMapperTest {
