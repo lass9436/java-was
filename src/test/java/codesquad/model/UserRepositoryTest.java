@@ -31,7 +31,7 @@ class UserRepositoryTest {
 	void 유저_중복_생성_테스트() {
 		User user = new User("user1", "password1", "User One", "user1@example.com");
 		userRepository.create(user);
-		HttpStatusException exception = assertThrows(HttpStatusException.class, () -> userRepository.create(user));
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> userRepository.create(user));
 		assertEquals("User with id user1 already exists", exception.getMessage());
 	}
 
@@ -45,7 +45,7 @@ class UserRepositoryTest {
 
 	@Test
 	void 존재하지_않는_유저_조회_테스트() {
-		HttpStatusException exception = assertThrows(HttpStatusException.class,
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 			() -> userRepository.findById("nonexistent"));
 		assertEquals("User with id nonexistent does not exist", exception.getMessage());
 	}
@@ -63,7 +63,7 @@ class UserRepositoryTest {
 	@Test
 	void 존재하지_않는_유저_업데이트_테스트() {
 		User user = new User("user1", "password1", "User One", "user1@example.com");
-		HttpStatusException exception = assertThrows(HttpStatusException.class, () -> userRepository.update(user));
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> userRepository.update(user));
 		assertEquals("User with id user1 does not exist", exception.getMessage());
 	}
 
@@ -72,13 +72,13 @@ class UserRepositoryTest {
 		User user = new User("user1", "password1", "User One", "user1@example.com");
 		userRepository.create(user);
 		userRepository.delete("user1");
-		HttpStatusException exception = assertThrows(HttpStatusException.class, () -> userRepository.findById("user1"));
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> userRepository.findById("user1"));
 		assertEquals("User with id user1 does not exist", exception.getMessage());
 	}
 
 	@Test
 	void 존재하지_않는_유저_삭제_테스트() {
-		HttpStatusException exception = assertThrows(HttpStatusException.class,
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 			() -> userRepository.delete("nonexistent"));
 		assertEquals("User with id nonexistent does not exist", exception.getMessage());
 	}
