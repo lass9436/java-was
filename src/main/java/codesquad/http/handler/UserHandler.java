@@ -1,14 +1,10 @@
 package codesquad.http.handler;
 
-import static codesquad.utils.JsonUtils.*;
-
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
@@ -23,11 +19,11 @@ public class UserHandler {
 	private final UserRepository userRepository = new UserRepository();
 
 	public HttpResponse join(HttpRequest httpRequest) {
-		JsonNode body = httpRequest.body();
-		String userId = getFirstValueFromBody(body, "userId");
-		String password = getFirstValueFromBody(body, "password");
-		String name = getFirstValueFromBody(body, "name");
-		String email = getFirstValueFromBody(body, "email");
+		Map<String, List<String>> body = httpRequest.body();
+		String userId = body.get("userId").get(0);
+		String password = body.get("password").get(0);
+		String name = body.get("name").get(0);
+		String email = body.get("email").get(0);
 
 		final User user = new User(userId, password, name, email);
 		userRepository.create(user);
