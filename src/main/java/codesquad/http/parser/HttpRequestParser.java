@@ -82,20 +82,27 @@ public class HttpRequestParser {
 
 		String[] pairs = queryString.split("&");
 		for (String pair : pairs) {
-			String[] keyValue = pair.split("=");
-			try {
-				if (keyValue.length == 2) {
-					String key = URLDecoder.decode(keyValue[0], UTF8);
-					String value = URLDecoder.decode(keyValue[1], UTF8);
-					queryParams.computeIfAbsent(key, k -> new ArrayList<>()).add(value);
-				} else if (keyValue.length == 1) {
-					String key = URLDecoder.decode(keyValue[0], UTF8);
-					queryParams.computeIfAbsent(key, k -> new ArrayList<>()).add("");
-				}
-			} catch (UnsupportedEncodingException e) {
-				throw new HttpStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "URL 쿼리 파라미터 파싱에 실패했습니다.");
-			}
+			parsePair(pair, queryParams);
 		}
 		return queryParams;
+	}
+
+	private static void parsePair(String pair, Map<String, List<String>> queryParams) {
+		String[] keyValue = pair.split("=");
+		try {
+			if (keyValue.length == 2) {
+				addParam(queryParams, keyValue[0], keyValue[1]);
+			} else if (keyValue.length == 1) {
+				addParam(queryParams, keyValue[0], "");
+			}
+		} catch (UnsupportedEncodingException e) {
+			throw new HttpStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "URL 쿼리 파라미터 파싱에 실패했습니다.");
+		}
+	}
+
+	private static void addParam(Map<String, List<String>> queryParams, String key, String value) throws UnsupportedEncodingException {
+		String decodedKey = URLDecoder.decode(key, UTF8);
+		String decodedValue = URLDecoder.decode(value, UTF8);
+		queryParams.computeIfAbsent(decodedKey, k -> new ArrayList<>()).add(decodedValue);
 	}
 }
