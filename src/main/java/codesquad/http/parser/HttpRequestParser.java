@@ -1,6 +1,6 @@
 package codesquad.http.parser;
 
-import static codesquad.StringUtils.Constants.*;
+import static codesquad.utils.StringConstants.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -127,7 +127,7 @@ public class HttpRequestParser {
 				addParam(queryParams, keyValue[0], "");
 			}
 		} catch (UnsupportedEncodingException e) {
-			throw new HttpStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "URL 쿼리 파라미터 파싱에 실패했습니다.");
+			throw new HttpStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "URL 쿼리 파라미터 파싱에 실패했습니다.", e);
 		}
 	}
 

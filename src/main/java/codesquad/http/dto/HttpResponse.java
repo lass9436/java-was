@@ -1,6 +1,6 @@
 package codesquad.http.dto;
 
-import static codesquad.StringUtils.Constants.*;
+import static codesquad.utils.StringConstants.*;
 
 import java.util.List;
 import java.util.Map;
