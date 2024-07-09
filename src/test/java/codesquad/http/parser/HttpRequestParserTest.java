@@ -12,18 +12,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.status.HttpStatusException;
 
 @DisplayName("HttpRequestParser 테스트")
 class HttpRequestParserTest {
-
-	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Nested
 	class 요청_라인과_헤더를_테스트 {
@@ -116,7 +109,7 @@ class HttpRequestParserTest {
 
 		@Test
 		void 요청_라인과_헤더와_바디를_파싱한다() throws IOException {
-			String jsonBody = "{\"name\":\"John\",\"age\":30,\"email\":\"john@email.com\"}";
+			String jsonBody = "{\"name\":\"John\",\"age\":\"30\",\"email\":\"john@email.com\"}";
 			byte[] jsonBodyBytes = jsonBody.getBytes("UTF-8");
 			String httpRequestString =
 				"POST /submit HTTP/1.1\r\n" +
@@ -139,10 +132,14 @@ class HttpRequestParserTest {
 			assertEquals("localhost:8080", httpRequest.headers().get("Host").get(0));
 			assertEquals("keep-alive", httpRequest.headers().get("Connection").get(0));
 			assertEquals("application/json", httpRequest.headers().get("Content-Type").get(0));
-			assertEquals(jsonBodyBytes.length + "", httpRequest.headers().get("Content-Length").get(0));
+			assertEquals(String.valueOf(jsonBodyBytes.length), httpRequest.headers().get("Content-Length").get(0));
 
 			// 바디 검증
-			JsonNode expectedBody = objectMapper.readTree(jsonBody);
+			Map<String, List<String>> expectedBody = Map.of(
+				"name", List.of("John"),
+				"age", List.of("30"),
+				"email", List.of("john@email.com")
+			);
 			assertEquals(expectedBody, httpRequest.body());
 		}
 
@@ -174,9 +171,10 @@ class HttpRequestParserTest {
 			assertEquals(String.valueOf(formBodyBytes.length), httpRequest.headers().get("Content-Length").get(0));
 
 			// 바디 검증
-			ObjectNode expectedBody = objectMapper.createObjectNode();
-			expectedBody.put("name", "John");
-			expectedBody.put("age", "30");
+			Map<String, List<String>> expectedBody = Map.of(
+				"name", List.of("John"),
+				"age", List.of("30")
+			);
 			assertEquals(expectedBody, httpRequest.body());
 		}
 
@@ -208,13 +206,10 @@ class HttpRequestParserTest {
 			assertEquals(String.valueOf(formBodyBytes.length), httpRequest.headers().get("Content-Length").get(0));
 
 			// 바디 검증
-			ObjectNode expectedBody = objectMapper.createObjectNode();
-			ArrayNode names = objectMapper.createArrayNode();
-			names.add("John");
-			names.add("Jane");
-			expectedBody.set("name", names);
-			expectedBody.put("age", "30");
-
+			Map<String, List<String>> expectedBody = Map.of(
+				"name", List.of("John", "Jane"),
+				"age", List.of("30")
+			);
 			assertEquals(expectedBody, httpRequest.body());
 		}
 	}
