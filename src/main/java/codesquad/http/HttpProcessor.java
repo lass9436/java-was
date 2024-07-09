@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
-import codesquad.http.handler.HttpDynamicHandler;
-import codesquad.http.handler.HttpStaticHandler;
+import codesquad.http.mapper.HttpDynamicHandlerMapper;
+import codesquad.http.mapper.HttpStaticHandlerMapper;
 import codesquad.http.parser.HttpRequestParser;
 import codesquad.http.status.HttpStatusException;
 
@@ -23,8 +23,8 @@ public class HttpProcessor implements Runnable {
 
 	private final Socket socket;
 
-	private final HttpDynamicHandler httpDynamicHandler = new HttpDynamicHandler();
-	private final HttpStaticHandler httpStaticHandler = new HttpStaticHandler();
+	private final HttpDynamicHandlerMapper httpDynamicHandlerMapper = new HttpDynamicHandlerMapper();
+	private final HttpStaticHandlerMapper httpStaticHandlerMapper = new HttpStaticHandlerMapper();
 
 	public HttpProcessor(Socket clientSocket) {
 		socket = clientSocket;
@@ -44,25 +44,23 @@ public class HttpProcessor implements Runnable {
 
 				// HTTP Response
 				// Dynamic
-				HttpResponse httpResponse = httpDynamicHandler.handle(httpRequest);
+				HttpResponse httpResponse = httpDynamicHandlerMapper.handle(httpRequest);
 				// Static
 				if (httpResponse == null) {
-					httpResponse = httpStaticHandler.handle(httpRequest);
+					httpResponse = httpStaticHandlerMapper.handle(httpRequest);
 				}
 				clientOutput.write(httpResponse.getBytes());
 
 			} catch (HttpStatusException e) {
-				logger.error("HTTP 상태 코드 예외 발생: " + e.getStatus().getCode() + " " + e.getMessage());
+				logger.error("HTTP 상태 코드 예외 발생: { }", e);
 				HttpResponse errorResponse = new HttpResponse("HTTP/1.1", e.getStatus(), Map.of(),
 					e.getStatus().getReasonPhrase().getBytes());
 				clientOutput.write(errorResponse.getBytes());
 			}
-
 			// write flush
 			clientOutput.flush();
 		} catch (IOException e) {
-			logger.error("클라이언트 소켓의 write 또는 flush 에 실패했습니다.");
-			logger.error(e.getMessage());
+			logger.error("클라이언트 소켓의 예외 발생: { }", e);
 		}
 	}
 }
