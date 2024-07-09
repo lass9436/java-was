@@ -13,6 +13,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import codesquad.http.dto.HttpRequest;
@@ -162,19 +163,33 @@ public class HttpRequestParser {
 	private static JsonNode parseFormUrlEncodedBody(String body) throws IOException {
 		ObjectNode node = objectMapper.createObjectNode();
 		String[] pairs = body.split("&");
+
 		for (String pair : pairs) {
 			String[] keyValue = pair.split("=");
-			if (keyValue.length == 2) {
+			if (keyValue.length >= 1) {
 				String key = URLDecoder.decode(keyValue[0], UTF8);
-				String value = URLDecoder.decode(keyValue[1], UTF8);
-				node.put(key, value);
-			} else if (keyValue.length == 1) {
-				String key = URLDecoder.decode(keyValue[0], UTF8);
-				node.put(key, "");
+				String value = keyValue.length == 2 ? URLDecoder.decode(keyValue[1], UTF8) : "";
+
+				if (node.has(key)) {
+					// 키가 이미 있다면 필요할 경우 ArrayNode 를 생성합니다.
+					JsonNode existingNode = node.get(key);
+					ArrayNode arrayNode;
+					if (existingNode.isArray()) {
+						arrayNode = (ArrayNode) existingNode;
+					} else {
+						arrayNode = objectMapper.createArrayNode();
+						arrayNode.add(existingNode.asText());
+					}
+					arrayNode.add(value);
+					node.set(key, arrayNode);
+				} else {
+					node.put(key, value);
+				}
 			}
 		}
 		return node;
 	}
+
 
 	private static int getContentLength(Map<String, List<String>> headers) {
 		List<String> contentLengthHeaders = headers.get("Content-Length");
