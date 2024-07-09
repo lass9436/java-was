@@ -12,21 +12,21 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
-import codesquad.http.handler.HttpStaticHandler;
+import codesquad.http.mapper.HttpStaticHandlerMapper;
 
 @DisplayName("HttpStaticHandler 테스트")
-class HttpStaticHandlerTest {
+class HttpStaticHandlerMapperTest {
 
-	private static HttpStaticHandler httpStaticHandler;
+	private static HttpStaticHandlerMapper httpStaticHandlerMapper;
 
 	@BeforeAll
 	static void setUp() {
-		httpStaticHandler = new HttpStaticHandler();
+		httpStaticHandlerMapper = new HttpStaticHandlerMapper();
 	}
 
 	@Test
 	void HttpRequest를_받아_HttpResponse를_반환한다() throws IOException {
-		HttpResponse httpResponse = httpStaticHandler.handle(new HttpRequest("GET", "/", "HTTP/1.1", null, null, null));
+		HttpResponse httpResponse = httpStaticHandlerMapper.handle(new HttpRequest("GET", "/", "HTTP/1.1", null, null, null));
 		assertNotNull(httpResponse);
 	}
 
@@ -39,7 +39,7 @@ class HttpStaticHandlerTest {
 	})
 	void path에_따라_정적_리소스를_반환한다(String path, int expectedStatusCode, String expectedContentType) {
 		HttpRequest httpRequest = new HttpRequest("GET", path, "HTTP/1.1", null, null, null);
-		HttpResponse httpResponse = httpStaticHandler.handle(httpRequest);
+		HttpResponse httpResponse = httpStaticHandlerMapper.handle(httpRequest);
 
 		assertEquals("HTTP/1.1", httpResponse.version());
 		assertEquals(expectedStatusCode, httpResponse.statusCode());

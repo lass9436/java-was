@@ -1,4 +1,4 @@
-package codesquad.http.handler;
+package codesquad.http.mapper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,7 +17,7 @@ import codesquad.http.dto.HttpResponse;
 import codesquad.http.status.HttpStatus;
 import codesquad.http.status.HttpStatusException;
 
-public class HttpStaticHandler {
+public class HttpStaticHandlerMapper {
 
 	private static final Logger logger = LoggerFactory.getLogger(HttpHandler.class);
 	private static final String STATIC_ROOT_PATH = "static";
@@ -47,7 +47,7 @@ public class HttpStaticHandler {
 
 		try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
 			if (inputStream == null) {
-				throw new HttpStatusException(HttpStatus.NOT_FOUND, "File not found");
+				throw new HttpStatusException(HttpStatus.NOT_FOUND, "File not found", null);
 			}
 
 			byte[] body = readAllBytes(inputStream);
@@ -61,7 +61,7 @@ public class HttpStaticHandler {
 
 			return new HttpResponse(version, HttpStatus.OK, headers, body);
 		} catch (IOException e) {
-			throw new HttpStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to read the file");
+			throw new HttpStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to read the file", e);
 		}
 	}
 
