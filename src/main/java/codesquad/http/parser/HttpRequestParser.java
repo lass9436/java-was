@@ -11,11 +11,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.status.HttpStatus;
 import codesquad.http.status.HttpStatusException;
 
 public class HttpRequestParser {
+
+	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	public static HttpRequest parse(BufferedReader reader) throws IOException {
 		String requestLine = reader.readLine();
@@ -27,13 +32,15 @@ public class HttpRequestParser {
 
 		Map<String, List<String>> queryParams = parseQueryParams(queryString);
 		Map<String, List<String>> headers = parseHeaders(reader);
+		JsonNode body = parseRequestBody(reader, headers);
 
 		return new HttpRequest(
 			requestLineMap.get("method"),
 			path,
 			requestLineMap.get("version"),
 			headers,
-			queryParams
+			queryParams,
+			body
 		);
 	}
 
@@ -122,9 +129,55 @@ public class HttpRequestParser {
 		}
 	}
 
-	private static void addParam(Map<String, List<String>> queryParams, String key, String value) throws UnsupportedEncodingException {
+	private static void addParam(Map<String, List<String>> queryParams, String key, String value) throws
+		UnsupportedEncodingException {
 		String decodedKey = URLDecoder.decode(key, UTF8);
 		String decodedValue = URLDecoder.decode(value, UTF8);
 		queryParams.computeIfAbsent(decodedKey, k -> new ArrayList<>()).add(decodedValue);
+	}
+
+	private static JsonNode parseRequestBody(BufferedReader reader, Map<String, List<String>> headers) throws IOException {
+		int contentLength = getContentLength(headers);
+		if (contentLength == -1) {
+			return objectMapper.createObjectNode();  // 빈 JSON 객체를 반환합니다.
+		}
+
+		String body = readBody(reader, contentLength);
+		if (body == null) {
+			return objectMapper.createObjectNode();  // 빈 JSON 객체를 반환합니다.
+		}
+
+		return objectMapper.readTree(body);
+	}
+
+	private static int getContentLength(Map<String, List<String>> headers) {
+		List<String> contentLengthHeaders = headers.get("Content-Length");
+		if (contentLengthHeaders == null || contentLengthHeaders.isEmpty()) {
+			return -1;  // Content-Length 헤더가 없는 경우
+		}
+
+		try {
+			return Integer.parseInt(contentLengthHeaders.get(0));
+		} catch (NumberFormatException e) {
+			return -1;  // Content-Length 헤더 값이 유효하지 않은 경우
+		}
+	}
+
+	private static String readBody(BufferedReader reader, int contentLength) throws IOException {
+		char[] buffer = new char[1024];
+		StringBuilder body = new StringBuilder();
+		int totalRead = 0;
+		int bytesRead;
+
+		while (totalRead < contentLength && (bytesRead = reader.read(buffer, 0, Math.min(buffer.length, contentLength - totalRead))) != -1) {
+			body.append(buffer, 0, bytesRead);
+			totalRead += bytesRead;
+		}
+
+		if (totalRead != contentLength) {
+			return null;  // 실제로 읽은 길이가 Content-Length와 다르면 null 반환
+		}
+
+		return body.toString();
 	}
 }
