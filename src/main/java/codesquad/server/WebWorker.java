@@ -1,4 +1,4 @@
-package codesquad.http;
+package codesquad.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,6 +10,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import codesquad.container.Container;
 import codesquad.http.constants.HttpVersion;
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
@@ -18,17 +19,20 @@ import codesquad.http.mapper.HttpStaticHandlerMapper;
 import codesquad.http.parser.HttpRequestParser;
 import codesquad.http.status.HttpStatusException;
 
-public class HttpProcessor implements Runnable {
+public class WebWorker implements Runnable {
 
-	private static final Logger logger = LoggerFactory.getLogger(HttpProcessor.class);
+	private static final Logger logger = LoggerFactory.getLogger(WebWorker.class);
 
 	private final Socket socket;
+	private final Container container;
+	private final HttpDynamicHandlerMapper httpDynamicHandlerMapper;
+	private final HttpStaticHandlerMapper httpStaticHandlerMapper;
 
-	private final HttpDynamicHandlerMapper httpDynamicHandlerMapper = new HttpDynamicHandlerMapper();
-	private final HttpStaticHandlerMapper httpStaticHandlerMapper = new HttpStaticHandlerMapper();
-
-	public HttpProcessor(Socket clientSocket) {
+	public WebWorker(Socket clientSocket) {
 		socket = clientSocket;
+		container = Container.getInstance();
+		httpDynamicHandlerMapper = container.getHttpDynamicHandlerMapper();
+		httpStaticHandlerMapper = container.getHttpStaticHandlerMapper();
 	}
 
 	@Override

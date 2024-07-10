@@ -8,8 +8,6 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import codesquad.http.HttpProcessor;
-
 public class WebServer {
 
 	private final Logger logger = LoggerFactory.getLogger(WebServer.class);
@@ -33,7 +31,7 @@ public class WebServer {
 			logger.info("Starting web server on port {}", PORT);
 			try (ServerSocket serverSocket = new ServerSocket(PORT, BACKLOG)) {
 				while (running) {
-					threadPool.submit(new HttpProcessor(serverSocket.accept()));
+					threadPool.submit(new WebWorker(serverSocket.accept()));
 				}
 			}
 			threadPool.shutdown();
