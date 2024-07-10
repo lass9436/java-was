@@ -6,6 +6,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import codesquad.http.annotation.HttpFunction;
+import codesquad.http.annotation.HttpHandler;
+import codesquad.http.constants.HttpHandleType;
+import codesquad.http.constants.HttpMethod;
 import codesquad.http.constants.HttpVersion;
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
@@ -13,12 +17,14 @@ import codesquad.http.status.HttpStatus;
 import codesquad.model.User;
 import codesquad.model.UserRepository;
 
+@HttpHandler
 public class UserHandler {
 
 	private final Logger logger = LoggerFactory.getLogger(UserHandler.class);
 
 	private final UserRepository userRepository = new UserRepository();
 
+	@HttpFunction(path = "/create", method = HttpMethod.POST, type = HttpHandleType.DYNAMIC)
 	public HttpResponse join(HttpRequest httpRequest) {
 		Map<String, List<String>> body = httpRequest.body();
 		String userId = body.get("userId").get(0);
