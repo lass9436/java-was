@@ -3,6 +3,7 @@ package codesquad.http.mapper;
 import java.util.Map;
 import java.util.function.Function;
 
+import codesquad.http.constants.HttpMethod;
 import codesquad.http.dto.HttpEndPoint;
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
@@ -15,7 +16,7 @@ public class HttpDynamicHandlerMapper {
 	private final Map<HttpEndPoint, Function<HttpRequest, HttpResponse>> handlers;
 
 	public HttpDynamicHandlerMapper() {
-		this.handlers = Map.of(new HttpEndPoint("/create", "POST"), new UserHandler()::join);
+		this.handlers = Map.of(new HttpEndPoint("/create", HttpMethod.POST), new UserHandler()::join);
 	}
 
 	public HttpResponse handle(HttpRequest httpRequest) {

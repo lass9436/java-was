@@ -12,6 +12,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import codesquad.http.constants.HttpMethod;
+import codesquad.http.constants.HttpVersion;
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.status.HttpStatusException;
 
@@ -90,9 +92,9 @@ class HttpRequestParserTest {
 			BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
 			HttpRequest httpRequest = HttpRequestParser.parse(reader);
 
-			assertEquals("GET", httpRequest.method());
+			assertEquals(HttpMethod.GET, httpRequest.method());
 			assertEquals("/index.html", httpRequest.path());
-			assertEquals("HTTP/1.1", httpRequest.version());
+			assertEquals(HttpVersion.HTTP_1_1, httpRequest.version());
 			assertEquals("localhost:8080", httpRequest.headers().get("Host").get(0));
 			assertEquals("keep-alive", httpRequest.headers().get("Connection").get(0));
 			assertTrue(httpRequest.headers().get("Accept").contains("text/html"));
@@ -124,9 +126,9 @@ class HttpRequestParserTest {
 			HttpRequest httpRequest = HttpRequestParser.parse(reader);
 
 			// 요청 라인 검증
-			assertEquals("POST", httpRequest.method());
+			assertEquals(HttpMethod.POST, httpRequest.method());
 			assertEquals("/submit", httpRequest.path());
-			assertEquals("HTTP/1.1", httpRequest.version());
+			assertEquals(HttpVersion.HTTP_1_1, httpRequest.version());
 
 			// 헤더 검증
 			assertEquals("localhost:8080", httpRequest.headers().get("Host").get(0));
@@ -160,9 +162,9 @@ class HttpRequestParserTest {
 			HttpRequest httpRequest = HttpRequestParser.parse(reader);
 
 			// 요청 라인 검증
-			assertEquals("POST", httpRequest.method());
+			assertEquals(HttpMethod.POST, httpRequest.method());
 			assertEquals("/submit", httpRequest.path());
-			assertEquals("HTTP/1.1", httpRequest.version());
+			assertEquals(HttpVersion.HTTP_1_1, httpRequest.version());
 
 			// 헤더 검증
 			assertEquals("localhost:8080", httpRequest.headers().get("Host").get(0));
@@ -195,9 +197,9 @@ class HttpRequestParserTest {
 			HttpRequest httpRequest = HttpRequestParser.parse(reader);
 
 			// 요청 라인 검증
-			assertEquals("POST", httpRequest.method());
+			assertEquals(HttpMethod.POST, httpRequest.method());
 			assertEquals("/submit", httpRequest.path());
-			assertEquals("HTTP/1.1", httpRequest.version());
+			assertEquals(HttpVersion.HTTP_1_1, httpRequest.version());
 
 			// 헤더 검증
 			assertEquals("localhost:8080", httpRequest.headers().get("Host").get(0));

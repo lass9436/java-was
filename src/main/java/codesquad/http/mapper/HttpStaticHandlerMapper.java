@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import com.sun.net.httpserver.HttpHandler;
 
+import codesquad.http.constants.HttpMethod;
+import codesquad.http.constants.HttpVersion;
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
 import codesquad.http.status.HttpStatus;
@@ -45,7 +47,7 @@ public class HttpStaticHandlerMapper {
 		path = urlMapping.getOrDefault(path, path);
 		String resourcePath = STATIC_ROOT_PATH + path;
 
-		if (!httpRequest.method().equals("GET")) {
+		if (HttpMethod.GET != httpRequest.method()) {
 			throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Invalid HTTP method");
 		}
 
@@ -55,7 +57,7 @@ public class HttpStaticHandlerMapper {
 			}
 
 			byte[] body = readAllBytes(inputStream);
-			String version = httpRequest.version();
+			HttpVersion version = httpRequest.version();
 			String extension = resourcePath.substring(resourcePath.lastIndexOf(".") + 1);
 			String mimeType = MIME_TYPES.getOrDefault(extension, "application/octet-stream");
 

@@ -44,7 +44,7 @@ public class UserHandlerTest {
 
 		HttpResponse response = userHandler.join(request);
 
-		assertEquals(HttpStatus.FOUND.getCode(), response.statusCode());
+		assertEquals(HttpStatus.FOUND.getCode(), response.status().getCode());
 		assertTrue(response.headers().containsKey("Location"));
 		assertEquals("/index.html", response.headers().get("Location").get(0));
 

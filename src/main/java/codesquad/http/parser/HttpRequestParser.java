@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import codesquad.http.constants.HttpMethod;
+import codesquad.http.constants.HttpVersion;
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.status.HttpStatus;
 import codesquad.http.status.HttpStatusException;
@@ -29,10 +31,13 @@ public class HttpRequestParser {
 		Map<String, List<String>> headers = parseHeaders(reader);
 		Map<String, List<String>> body = parseRequestBody(reader, headers);
 
+		HttpMethod httpMethod = HttpMethod.valueOf(requestLineMap.get("method"));
+		HttpVersion httpVersion = HttpVersion.valueOf(requestLineMap.get("version").replace('/','_').replace('.', '_'));
+
 		return new HttpRequest(
-			requestLineMap.get("method"),
+			httpMethod,
 			path,
-			requestLineMap.get("version"),
+			httpVersion,
 			headers,
 			queryParams,
 			body

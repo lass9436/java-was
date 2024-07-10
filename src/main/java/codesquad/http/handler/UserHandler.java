@@ -6,6 +6,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import codesquad.http.constants.HttpVersion;
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
 import codesquad.http.status.HttpStatus;
@@ -30,6 +31,6 @@ public class UserHandler {
 
 		logger.info("Creating user: {}", user);
 		Map<String, List<String>> headers = Map.of("Location", List.of("/index.html"));
-		return new HttpResponse("HTTP/1.1", HttpStatus.FOUND, headers, new byte[0]);
+		return new HttpResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND, headers, new byte[0]);
 	}
 }

@@ -10,6 +10,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import codesquad.http.constants.HttpVersion;
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
 import codesquad.http.mapper.HttpDynamicHandlerMapper;
@@ -53,7 +54,7 @@ public class HttpProcessor implements Runnable {
 
 			} catch (HttpStatusException e) {
 				logger.error("HTTP 상태 코드 예외 발생: { }", e);
-				HttpResponse errorResponse = new HttpResponse("HTTP/1.1", e.getStatus(), Map.of(),
+				HttpResponse errorResponse = new HttpResponse(HttpVersion.HTTP_1_1, e.getStatus(), Map.of(),
 					e.getStatus().getReasonPhrase().getBytes());
 				clientOutput.write(errorResponse.getBytes());
 			}
