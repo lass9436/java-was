@@ -4,24 +4,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-public record HttpRequest(String method, String url, String version, Map<String, List<String>> headers,
-						  Map<String, List<String>> parameters) {
+public record HttpRequest(String method, String path, String version, Map<String, List<String>> headers,
+						  Map<String, List<String>> parameters, Map<String, List<String>> body) {
 
 	@Override
 	public String toString() {
-		StringBuilder headersString = new StringBuilder();
-		for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+		String headersString = mapToString(headers);
+		String parametersString = mapToString(parameters);
+		String bodyString = mapToString(body);
+
+		return "HttpRequest{" +
+			"method='" + method + '\'' +
+			", path='" + path + '\'' +
+			", version='" + version + '\'' +
+			", headers=" + headersString +
+			", parameters=" + parametersString +
+			", body=" + bodyString +
+			'}';
+	}
+
+	private String mapToString(Map<String, List<String>> map) {
+		StringBuilder result = new StringBuilder();
+		for (Map.Entry<String, List<String>> entry : map.entrySet()) {
 			StringJoiner valuesJoiner = new StringJoiner(", ");
 			for (String value : entry.getValue()) {
 				valuesJoiner.add(value);
 			}
-			headersString.append(entry.getKey()).append(": ").append(valuesJoiner).append("\n");
+			result.append(entry.getKey()).append(": ").append(valuesJoiner).append("\n");
 		}
-		return "HttpRequest{" +
-			"method='" + method + '\'' +
-			", url='" + url + '\'' +
-			", version='" + version + '\'' +
-			", headers=" + headersString +
-			'}';
+		return result.toString();
 	}
 }

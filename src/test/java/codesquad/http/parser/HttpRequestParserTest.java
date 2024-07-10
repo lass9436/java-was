@@ -1,4 +1,4 @@
-package codesquad.http;
+package codesquad.http.parser;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import codesquad.http.dto.HttpRequest;
-import codesquad.http.parser.HttpRequestParser;
 import codesquad.http.status.HttpStatusException;
 
 @DisplayName("HttpRequestParser 테스트")
@@ -92,7 +91,7 @@ class HttpRequestParserTest {
 			HttpRequest httpRequest = HttpRequestParser.parse(reader);
 
 			assertEquals("GET", httpRequest.method());
-			assertEquals("/index.html", httpRequest.url());
+			assertEquals("/index.html", httpRequest.path());
 			assertEquals("HTTP/1.1", httpRequest.version());
 			assertEquals("localhost:8080", httpRequest.headers().get("Host").get(0));
 			assertEquals("keep-alive", httpRequest.headers().get("Connection").get(0));
@@ -102,6 +101,116 @@ class HttpRequestParserTest {
 			assertTrue(httpRequest.headers().get("Accept").contains("image/webp"));
 			assertTrue(httpRequest.headers().get("Accept").contains("image/apng"));
 			assertTrue(httpRequest.headers().get("Accept").contains("*/*;q=0.8"));
+		}
+	}
+
+	@Nested
+	class 요청_라인과_헤더와_바디를_테스트 {
+
+		@Test
+		void 요청_라인과_헤더와_바디를_파싱한다() throws IOException {
+			String jsonBody = "{\"name\":\"John\",\"age\":\"30\",\"email\":\"john@email.com\"}";
+			byte[] jsonBodyBytes = jsonBody.getBytes("UTF-8");
+			String httpRequestString =
+				"POST /submit HTTP/1.1\r\n" +
+					"Host: localhost:8080\r\n" +
+					"Connection: keep-alive\r\n" +
+					"Content-Type: application/json\r\n" +
+					"Content-Length: " + jsonBodyBytes.length + "\r\n" +
+					"\r\n" +
+					jsonBody;
+
+			BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
+			HttpRequest httpRequest = HttpRequestParser.parse(reader);
+
+			// 요청 라인 검증
+			assertEquals("POST", httpRequest.method());
+			assertEquals("/submit", httpRequest.path());
+			assertEquals("HTTP/1.1", httpRequest.version());
+
+			// 헤더 검증
+			assertEquals("localhost:8080", httpRequest.headers().get("Host").get(0));
+			assertEquals("keep-alive", httpRequest.headers().get("Connection").get(0));
+			assertEquals("application/json", httpRequest.headers().get("Content-Type").get(0));
+			assertEquals(String.valueOf(jsonBodyBytes.length), httpRequest.headers().get("Content-Length").get(0));
+
+			// 바디 검증
+			Map<String, List<String>> expectedBody = Map.of(
+				"name", List.of("John"),
+				"age", List.of("30"),
+				"email", List.of("john@email.com")
+			);
+			assertEquals(expectedBody, httpRequest.body());
+		}
+
+		@Test
+		void 요청_라인과_헤더와_폼_데이터를_파싱한다() throws IOException {
+			String formBody = "name=John&age=30";
+			byte[] formBodyBytes = formBody.getBytes("UTF8");
+			String httpRequestString =
+				"POST /submit HTTP/1.1\r\n" +
+					"Host: localhost:8080\r\n" +
+					"Connection: keep-alive\r\n" +
+					"Content-Type: application/x-www-form-urlencoded\r\n" +
+					"Content-Length: " + formBodyBytes.length + "\r\n" +
+					"\r\n" +
+					formBody;
+
+			BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
+			HttpRequest httpRequest = HttpRequestParser.parse(reader);
+
+			// 요청 라인 검증
+			assertEquals("POST", httpRequest.method());
+			assertEquals("/submit", httpRequest.path());
+			assertEquals("HTTP/1.1", httpRequest.version());
+
+			// 헤더 검증
+			assertEquals("localhost:8080", httpRequest.headers().get("Host").get(0));
+			assertEquals("keep-alive", httpRequest.headers().get("Connection").get(0));
+			assertEquals("application/x-www-form-urlencoded", httpRequest.headers().get("Content-Type").get(0));
+			assertEquals(String.valueOf(formBodyBytes.length), httpRequest.headers().get("Content-Length").get(0));
+
+			// 바디 검증
+			Map<String, List<String>> expectedBody = Map.of(
+				"name", List.of("John"),
+				"age", List.of("30")
+			);
+			assertEquals(expectedBody, httpRequest.body());
+		}
+
+		@Test
+		void 요청_라인과_헤더와_중복된_키를_포함한_폼_데이터를_파싱한다() throws IOException {
+			String formBody = "name=John&age=30&name=Jane";
+			byte[] formBodyBytes = formBody.getBytes("UTF8");
+			String httpRequestString =
+				"POST /submit HTTP/1.1\r\n" +
+					"Host: localhost:8080\r\n" +
+					"Connection: keep-alive\r\n" +
+					"Content-Type: application/x-www-form-urlencoded\r\n" +
+					"Content-Length: " + formBodyBytes.length + "\r\n" +
+					"\r\n" +
+					formBody;
+
+			BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
+			HttpRequest httpRequest = HttpRequestParser.parse(reader);
+
+			// 요청 라인 검증
+			assertEquals("POST", httpRequest.method());
+			assertEquals("/submit", httpRequest.path());
+			assertEquals("HTTP/1.1", httpRequest.version());
+
+			// 헤더 검증
+			assertEquals("localhost:8080", httpRequest.headers().get("Host").get(0));
+			assertEquals("keep-alive", httpRequest.headers().get("Connection").get(0));
+			assertEquals("application/x-www-form-urlencoded", httpRequest.headers().get("Content-Type").get(0));
+			assertEquals(String.valueOf(formBodyBytes.length), httpRequest.headers().get("Content-Length").get(0));
+
+			// 바디 검증
+			Map<String, List<String>> expectedBody = Map.of(
+				"name", List.of("John", "Jane"),
+				"age", List.of("30")
+			);
+			assertEquals(expectedBody, httpRequest.body());
 		}
 	}
 

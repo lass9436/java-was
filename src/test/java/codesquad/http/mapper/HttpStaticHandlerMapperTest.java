@@ -1,4 +1,4 @@
-package codesquad.http;
+package codesquad.http.mapper;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -12,34 +12,33 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
-import codesquad.http.handler.HttpStaticHandler;
 
 @DisplayName("HttpStaticHandler 테스트")
-class HttpStaticHandlerTest {
+class HttpStaticHandlerMapperTest {
 
-	private static HttpStaticHandler httpStaticHandler;
+	private static HttpStaticHandlerMapper httpStaticHandlerMapper;
 
 	@BeforeAll
 	static void setUp() {
-		httpStaticHandler = new HttpStaticHandler();
+		httpStaticHandlerMapper = new HttpStaticHandlerMapper();
 	}
 
 	@Test
 	void HttpRequest를_받아_HttpResponse를_반환한다() throws IOException {
-		HttpResponse httpResponse = httpStaticHandler.handle(new HttpRequest("GET", "/", "HTTP/1.1", null, null));
+		HttpResponse httpResponse = httpStaticHandlerMapper.handle(new HttpRequest("GET", "/", "HTTP/1.1", null, null, null));
 		assertNotNull(httpResponse);
 	}
 
-	@ParameterizedTest(name = "{index} => url={0}, expectedStatusCode={1}, expectedContentType={2}")
+	@ParameterizedTest(name = "{index} => path={0}, expectedStatusCode={1}, expectedContentType={2}")
 	@CsvSource({
 		"'/', 200, 'text/html'",
 		"'/global.css', 200, 'text/css'",
 		"'/img/like.svg', 200, 'image/svg+xml'",
 		"'/favicon.ico', 200, 'image/x-icon'",
 	})
-	void url에_따라_정적_리소스를_반환한다(String url, int expectedStatusCode, String expectedContentType) {
-		HttpRequest httpRequest = new HttpRequest("GET", url, "HTTP/1.1", null, null);
-		HttpResponse httpResponse = httpStaticHandler.handle(httpRequest);
+	void path에_따라_정적_리소스를_반환한다(String path, int expectedStatusCode, String expectedContentType) {
+		HttpRequest httpRequest = new HttpRequest("GET", path, "HTTP/1.1", null, null, null);
+		HttpResponse httpResponse = httpStaticHandlerMapper.handle(httpRequest);
 
 		assertEquals("HTTP/1.1", httpResponse.version());
 		assertEquals(expectedStatusCode, httpResponse.statusCode());
