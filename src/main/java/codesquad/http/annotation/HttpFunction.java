@@ -10,7 +10,7 @@ import codesquad.http.constants.HttpMethod;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface HttpMapping {
+public @interface HttpFunction {
 	String path();
 	HttpMethod method();
 	HttpHandleType type();
