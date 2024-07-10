@@ -33,6 +33,7 @@ public class HttpStaticHandlerMapper {
 
 	private static final Map<String, String> urlMapping = Map.of(
 		"/", "/index.html",
+		"/login", "/login/index.html",
 		"/registration", "/registration/index.html"
 	);
 
