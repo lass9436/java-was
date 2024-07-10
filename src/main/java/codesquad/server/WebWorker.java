@@ -57,7 +57,7 @@ public class WebWorker implements Runnable {
 				clientOutput.write(httpResponse.getBytes());
 
 			} catch (HttpStatusException e) {
-				logger.error("HTTP 상태 코드 예외 발생: { }", e);
+				logger.error("HTTP 상태 코드 예외 발생: ", e);
 				HttpResponse errorResponse = new HttpResponse(HttpVersion.HTTP_1_1, e.getStatus(), Map.of(),
 					e.getStatus().getReasonPhrase().getBytes());
 				clientOutput.write(errorResponse.getBytes());
@@ -65,7 +65,7 @@ public class WebWorker implements Runnable {
 			// write flush
 			clientOutput.flush();
 		} catch (IOException e) {
-			logger.error("클라이언트 소켓의 예외 발생: { }", e);
+			logger.error("클라이언트 소켓의 예외 발생: ", e);
 		}
 	}
 }
