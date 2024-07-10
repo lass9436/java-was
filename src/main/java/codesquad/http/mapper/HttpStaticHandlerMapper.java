@@ -7,11 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.sun.net.httpserver.HttpHandler;
-
 import codesquad.http.constants.HttpMethod;
 import codesquad.http.constants.HttpVersion;
 import codesquad.http.dto.HttpRequest;
@@ -21,7 +16,6 @@ import codesquad.http.status.HttpStatusException;
 
 public class HttpStaticHandlerMapper {
 
-	private static final Logger logger = LoggerFactory.getLogger(HttpHandler.class);
 	private static final String STATIC_ROOT_PATH = "static";
 
 	private static final Map<String, String> MIME_TYPES = Map.of(
