@@ -3,20 +3,23 @@ package codesquad.http.mapper;
 import java.util.Map;
 import java.util.function.Function;
 
-import codesquad.http.constants.HttpMethod;
+import codesquad.http.constants.HttpHandleType;
 import codesquad.http.dto.HttpEndPoint;
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
-import codesquad.http.handler.UserHandler;
+import codesquad.http.registry.HttpHandlerRegistry;
 import codesquad.http.status.HttpStatus;
 import codesquad.http.status.HttpStatusException;
 
 public class HttpDynamicHandlerMapper {
 
 	private final Map<HttpEndPoint, Function<HttpRequest, HttpResponse>> handlers;
+	private final HttpHandlerRegistry registry;
+	private final HttpHandleType type = HttpHandleType.DYNAMIC;
 
-	public HttpDynamicHandlerMapper() {
-		this.handlers = Map.of(new HttpEndPoint("/create", HttpMethod.POST), new UserHandler()::join);
+	public HttpDynamicHandlerMapper(HttpHandlerRegistry registry) {
+		this.registry = registry;
+		handlers = registry.getHandlers(type);
 	}
 
 	public HttpResponse handle(HttpRequest httpRequest) {
