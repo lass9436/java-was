@@ -40,7 +40,7 @@ public class WebWorker {
 			try {
 				// HTTP Request
 				HttpRequest httpRequest = HttpRequestParser.parse(clientInputReader);
-				logger.debug(httpRequest.toString());
+				logger.debug(httpRequest.path());
 
 				// HTTP Response
 				// Dynamic
