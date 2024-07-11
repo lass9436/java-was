@@ -2,6 +2,7 @@ package codesquad.http.handler;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,5 +72,14 @@ public class UserHandler {
 			return new HttpResponse(HttpVersion.HTTP_1_1, HttpStatus.OK, Map.of(), user.toString().getBytes());
 		}
 		return new HttpResponse(HttpVersion.HTTP_1_1, HttpStatus.UNAUTHORIZED, Map.of(), new byte[0]);
+	}
+
+	@HttpFunction(path = "/users", method = HttpMethod.GET, type = HttpHandleType.DYNAMIC)
+	public HttpResponse getUsers(HttpRequest httpRequest) {
+		List<User> list = userRepository.findAll();
+		String body = list.stream()
+			.map(User::toString)
+			.collect(Collectors.joining(",", "[", "]"));
+		return new HttpResponse(HttpVersion.HTTP_1_1, HttpStatus.OK, Map.of(), body.getBytes());
 	}
 }
