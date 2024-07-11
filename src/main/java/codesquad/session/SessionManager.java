@@ -51,7 +51,7 @@ public class SessionManager {
 	}
 
 	private static boolean isExpired(Session session) {
-		return session == null || (session != null && session.expirationTime().isBefore(LocalDateTime.now()));
+		return session == null || session.expirationTime().isBefore(LocalDateTime.now());
 	}
 
 	private static void removeSession(String sessionId) {
