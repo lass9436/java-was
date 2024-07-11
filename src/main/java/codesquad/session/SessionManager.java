@@ -71,4 +71,6 @@ public class SessionManager {
 	}
 
 	public static void setSessionTimeoutSecond(long sessionTimeoutSecond) {SESSION_TIMEOUT_SECOND = sessionTimeoutSecond;}
+
+	public static void removeSession() { removeSession(getThreadLocalSID()); }
 }

@@ -17,6 +17,7 @@ import codesquad.http.dto.HttpResponse;
 import codesquad.http.status.HttpStatus;
 import codesquad.model.User;
 import codesquad.model.UserRepository;
+import codesquad.session.Session;
 import codesquad.session.SessionManager;
 
 @HttpHandler
@@ -81,5 +82,15 @@ public class UserHandler {
 			.map(User::toString)
 			.collect(Collectors.joining(",", "[", "]"));
 		return new HttpResponse(HttpVersion.HTTP_1_1, HttpStatus.OK, Map.of(), body.getBytes());
+	}
+
+	@HttpFunction(path = "/logout", method = HttpMethod.POST, type = HttpHandleType.DYNAMIC)
+	public HttpResponse logout(HttpRequest httpRequest) {
+		SessionManager.removeSession();
+		Map<String, List<String>> headers = Map.of(
+			"Set-Cookie", List.of("SID=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/"),
+			"Location", List.of("/") // 리다이렉트 헤더 추가
+		);
+		return new HttpResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND, headers, new byte[0]);
 	}
 }
