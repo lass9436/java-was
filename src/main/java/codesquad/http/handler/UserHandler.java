@@ -63,4 +63,13 @@ public class UserHandler {
 			return new HttpResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND, headers, new byte[0]);
 		}
 	}
+
+	@HttpFunction(path = "/isLogin", method = HttpMethod.GET, type = HttpHandleType.DYNAMIC)
+	public HttpResponse isLogin(HttpRequest httpRequest) {
+		User user = (User) SessionManager.getSession("user");
+		if (user != null) {
+			return new HttpResponse(HttpVersion.HTTP_1_1, HttpStatus.OK, Map.of(), user.toString().getBytes());
+		}
+		return new HttpResponse(HttpVersion.HTTP_1_1, HttpStatus.UNAUTHORIZED, Map.of(), new byte[0]);
+	}
 }
