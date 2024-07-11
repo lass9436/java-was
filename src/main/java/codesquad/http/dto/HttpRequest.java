@@ -4,22 +4,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-public record HttpRequest(String method, String path, String version, Map<String, List<String>> headers,
+import codesquad.http.constants.HttpMethod;
+import codesquad.http.constants.HttpVersion;
+
+public record HttpRequest(HttpMethod method, String path, HttpVersion version, Map<String, List<String>> headers,
 						  Map<String, List<String>> parameters, Map<String, List<String>> body) {
 
 	@Override
 	public String toString() {
-		String headersString = mapToString(headers);
-		String parametersString = mapToString(parameters);
-		String bodyString = mapToString(body);
-
 		return "HttpRequest{" +
-			"method='" + method + '\'' +
+			"method='" + method.getMethod() + '\'' +
 			", path='" + path + '\'' +
-			", version='" + version + '\'' +
-			", headers=" + headersString +
-			", parameters=" + parametersString +
-			", body=" + bodyString +
+			", version='" + version.getVersion() + '\'' +
+			", headers=" + mapToString(headers) +
+			", parameters=" + mapToString(parameters) +
+			", body=" + mapToString(body) +
 			'}';
 	}
 

@@ -11,9 +11,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import codesquad.http.constants.HttpMethod;
+import codesquad.http.constants.HttpVersion;
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.status.HttpStatus;
 import codesquad.http.status.HttpStatusException;
+import codesquad.session.SessionManager;
 
 public class HttpRequestParser {
 
@@ -29,10 +32,14 @@ public class HttpRequestParser {
 		Map<String, List<String>> headers = parseHeaders(reader);
 		Map<String, List<String>> body = parseRequestBody(reader, headers);
 
+		HttpMethod httpMethod = HttpMethod.valueOf(requestLineMap.get("method"));
+		HttpVersion httpVersion = HttpVersion.valueOf(
+			requestLineMap.get("version").replace('/', '_').replace('.', '_'));
+
 		return new HttpRequest(
-			requestLineMap.get("method"),
+			httpMethod,
 			path,
-			requestLineMap.get("version"),
+			httpVersion,
 			headers,
 			queryParams,
 			body
@@ -88,6 +95,22 @@ public class HttpRequestParser {
 
 			if (key.isEmpty() || value.isEmpty()) {
 				throw new HttpStatusException(HttpStatus.BAD_REQUEST, "헤더 키 또는 밸류가 비어있습니다.");
+			}
+
+			if (key.equalsIgnoreCase("Cookie")) {
+				String[] cookieValues = value.split(";");
+				for (String cookieValue : cookieValues) {
+					String[] cookiePair = cookieValue.trim().split("=");
+					if (cookiePair.length == 2) {
+						String cookieName = cookiePair[0].trim();
+						String cookieData = cookiePair[1].trim();
+						if (cookieName.equalsIgnoreCase("SID")) {
+							// Set SID in session manager
+							SessionManager.setThreadLocalSID(cookieData);
+						}
+					}
+				}
+				continue;
 			}
 
 			String[] values = value.split(",");

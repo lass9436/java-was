@@ -6,18 +6,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
+import codesquad.http.constants.HttpVersion;
 import codesquad.http.status.HttpStatus;
 
-public record HttpResponse(String version, int statusCode, String statusMessage, Map<String, List<String>> headers,
-						   byte[] body) {
-
-	public HttpResponse(String version, HttpStatus httpStatus, Map<String, List<String>> headers, byte[] body) {
-		this(version, httpStatus.getCode(), httpStatus.getReasonPhrase(), headers, body);
-	}
+public record HttpResponse(HttpVersion version, HttpStatus status, Map<String, List<String>> headers, byte[] body) {
 
 	public byte[] getBytes() {
 		StringBuilder response = new StringBuilder();
-		response.append(version).append(SPACE).append(statusCode).append(SPACE).append(statusMessage).append(CRLF);
+		response.append(version.getVersion()).append(SPACE).append(status.getCode()).append(SPACE).append(status.getReasonPhrase()).append(CRLF);
 
 		for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
 			StringJoiner valuesJoiner = new StringJoiner(COMMA_SPACE);
