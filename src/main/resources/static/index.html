@@ -165,6 +165,12 @@
                     loginElement.textContent = `${data.name} 님`;
                     loginElement.href = '/';
                   }
+                  // 회원 가입 링크를 유저 목록 링크로 변경
+                  const registrationElement = document.querySelector('.header__menu__item a[href="/registration"]');
+                  if (registrationElement) {
+                    registrationElement.textContent = '유저 목록';
+                    registrationElement.href = '/user/list';
+                  }
                 }
               })
               .catch(error => {
