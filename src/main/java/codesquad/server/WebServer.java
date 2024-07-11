@@ -36,8 +36,9 @@ public class WebServer {
 			logger.info("Starting web server on port {}", PORT);
 			try (ServerSocket serverSocket = new ServerSocket(PORT, BACKLOG)) {
 				while (running) {
+					Socket socket = serverSocket.accept();
 					threadPool.submit(() -> {
-						try (Socket clientSocket = serverSocket.accept()){
+						try (Socket clientSocket = socket){
 							webWorker.process(clientSocket);
 						} catch (IOException e) {
 							logger.error("소켓 연결에 실패했습니다. ", e);
