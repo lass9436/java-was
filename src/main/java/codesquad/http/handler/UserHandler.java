@@ -46,17 +46,20 @@ public class UserHandler {
 		Map<String, List<String>> body = httpRequest.body();
 		String id = body.get("id").get(0);
 		String password = body.get("password").get(0);
-
-		User user = userRepository.findById(id);
-		if (user != null && user.password().equals(password)) {
-			String sessionId = SessionManager.putSession("user", user);
-			Map<String, List<String>> headers = Map.of(
-				"Location", List.of("/index.html"),
-				"Set-Cookie", List.of("SID=" + sessionId + "; Path=/")
-			);
+		try {
+			User user = userRepository.findById(id);
+			if (user.password().equals(password)) {
+				String sessionId = SessionManager.putSession("user", user);
+				Map<String, List<String>> headers = Map.of(
+					"Location", List.of("/index.html"),
+					"Set-Cookie", List.of("SID=" + sessionId + "; Path=/")
+				);
+				return new HttpResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND, headers, new byte[0]);
+			}
+			Map<String, List<String>> headers = Map.of("Location", List.of("/login"));
 			return new HttpResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND, headers, new byte[0]);
-		} else {
-			Map<String, List<String>> headers = Map.of("Location", List.of("/user/login_failed.html"));
+		} catch (Exception e) {
+			Map<String, List<String>> headers = Map.of("Location", List.of("/login"));
 			return new HttpResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND, headers, new byte[0]);
 		}
 	}
