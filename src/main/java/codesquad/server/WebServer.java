@@ -2,6 +2,7 @@ package codesquad.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -36,8 +37,8 @@ public class WebServer {
 			try (ServerSocket serverSocket = new ServerSocket(PORT, BACKLOG)) {
 				while (running) {
 					threadPool.submit(() -> {
-						try {
-							webWorker.process(serverSocket.accept());
+						try (Socket clientSocket = serverSocket.accept()){
+							webWorker.process(clientSocket);
 						} catch (IOException e) {
 							logger.error("소켓 연결에 실패했습니다. ", e);
 						}
