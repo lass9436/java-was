@@ -17,6 +17,7 @@ import codesquad.http.mapper.HttpDynamicHandlerMapper;
 import codesquad.http.mapper.HttpStaticHandlerMapper;
 import codesquad.http.parser.HttpRequestParser;
 import codesquad.http.status.HttpStatusException;
+import codesquad.session.SessionManager;
 
 public class WebWorker {
 
@@ -60,6 +61,8 @@ public class WebWorker {
 			clientOutput.flush();
 		} catch (IOException e) {
 			logger.error("클라이언트 소켓의 예외 발생: ", e);
+		} finally {
+			SessionManager.removeThreadLocalSID();
 		}
 	}
 }
