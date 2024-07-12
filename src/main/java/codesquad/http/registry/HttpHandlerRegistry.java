@@ -3,11 +3,19 @@ package codesquad.http.registry;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import codesquad.http.annotation.HttpFunction;
 import codesquad.http.annotation.HttpHandler;
@@ -17,6 +25,8 @@ import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
 
 public class HttpHandlerRegistry {
+
+	private final Logger logger = LoggerFactory.getLogger(HttpHandlerRegistry.class);
 
 	private final String packageName = "codesquad.http.handler";
 
@@ -28,7 +38,7 @@ public class HttpHandlerRegistry {
 				.filter(handlerClass -> handlerClass.isAnnotationPresent(HttpHandler.class))
 				.forEach(handlerClass -> registerHandlerMethods(handlers, handlerClass, type));
 		} catch (Exception e) {
-			throw new RuntimeException("Failed to load handler classes from package: " + packageName, e);
+			throw new RuntimeException("패키지에서 핸들러 클래스를 로드하지 못했습니다: " + packageName, e);
 		}
 		return handlers;
 	}
@@ -49,7 +59,7 @@ public class HttpHandlerRegistry {
 					}
 				});
 		} catch (Exception e) {
-			throw new RuntimeException("Failed to register handler methods for class: " + handlerClass.getName(), e);
+			throw new RuntimeException("클래스에 대한 핸들러 메서드를 등록하지 못했습니다: " + handlerClass.getName(), e);
 		}
 	}
 
@@ -65,21 +75,38 @@ public class HttpHandlerRegistry {
 
 	private Class<?>[] getClasses(String packageName) throws ClassNotFoundException, IOException {
 		String path = packageName.replace('.', '/');
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		ClassLoader classLoader = getClass().getClassLoader();
 		URL resource = classLoader.getResource(path);
 		if (resource == null) {
-			throw new ClassNotFoundException("No resource for " + path);
+			throw new ClassNotFoundException("리소스를 찾을 수 없습니다: " + path);
 		}
 
-		File directory = new File(resource.getFile());
+		if (resource.getProtocol().equals("file")) {
+			return getClassesFromFileSystem(packageName, resource);
+		} else if (resource.getProtocol().equals("jar")) {
+			return getClassesFromJarFile(packageName, resource);
+		} else {
+			throw new ClassNotFoundException("지원되지 않는 프로토콜입니다: " + resource.getProtocol());
+		}
+	}
+
+	private Class<?>[] getClassesFromFileSystem(String packageName, URL resource) throws ClassNotFoundException {
+		logger.info("파일 시스템을 사용합니다");
+		File directory;
+		try {
+			directory = new File(resource.toURI());
+		} catch (URISyntaxException e) {
+			directory = new File(resource.getPath());
+		}
+
 		if (!directory.exists()) {
 			throw new ClassNotFoundException(
-				packageName + " (" + directory.getPath() + ") does not appear to be a valid package");
+				packageName + " (" + directory.getPath() + ") 는 유효한 패키지로 보이지 않습니다");
 		}
 
 		File[] files = directory.listFiles();
 		if (files == null) {
-			throw new ClassNotFoundException("Failed to list files for package " + packageName);
+			throw new ClassNotFoundException("패키지에 대한 파일 목록을 가져오지 못했습니다: " + packageName);
 		}
 
 		return Arrays.stream(files)
@@ -93,5 +120,26 @@ public class HttpHandlerRegistry {
 				}
 			})
 			.toArray(Class<?>[]::new);
+	}
+
+	private Class<?>[] getClassesFromJarFile(String packageName, URL resource) throws IOException {
+		logger.info("JAR 시스템을 사용합니다");
+		String jarPath = resource.getPath().substring(5, resource.getPath().indexOf("!"));
+		try (JarFile jarFile = new JarFile(jarPath)) {
+			Enumeration<JarEntry> entries = jarFile.entries();
+			return Collections.list(entries).stream()
+				.filter(entry -> entry.getName().startsWith(packageName.replace('.', '/')))
+				.filter(entry -> entry.getName().endsWith(".class"))
+				.filter(entry -> !entry.isDirectory())
+				.map(entry -> {
+					String className = entry.getName().replace('/', '.').substring(0, entry.getName().length() - 6);
+					try {
+						return Class.forName(className);
+					} catch (ClassNotFoundException e) {
+						throw new RuntimeException(e);
+					}
+				})
+				.toArray(Class<?>[]::new);
+		}
 	}
 }

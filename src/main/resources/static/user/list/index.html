@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/reset.css" rel="stylesheet" />
+    <link href="/global.css" rel="stylesheet" />
+    <link href="/main.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <a href="/"><img src="/img/signiture.svg" /></a>
+        <ul class="header__menu">
+          <li class="header__menu__item">
+            <a class="btn btn_contained btn_size_s" href="/login">로그인</a>
+          </li>
+          <li class="header__menu__item">
+            <a class="btn btn_ghost btn_size_s" href="/registration">
+              회원 가입
+            </a>
+          </li>
+          <li class="header__menu__item" id="logout" style="display: none">
+            <form id="logoutForm" action="/logout" method="POST" style="display: inline;">
+              <button type="submit" class="btn btn_ghost btn_size_s">로그 아웃</button>
+            </form>
+          </li>
+        </ul>
+      </header>
+      <div class="wrapper">
+        <!--유저 정보 페이지-->
+        <ul class="user-list" id="user-list">
+          <!-- 유저 목록이 여기에 동적으로 추가될 것입니다 -->
+        </ul>
+      </div>
+    </div>
+  </body>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // 로그인 상태 확인
+      fetch('/isLogin')
+              .then(response => {
+                if (response.ok) {
+                  return response.json();
+                } else if (response.status === 401) {
+                  // 401 Unauthorized 상태일 경우 로그인 페이지로 리다이렉트
+                  window.location.href = '/login';
+                } else {
+                  throw new Error('Network response was not ok.');
+                }
+              })
+              .then(data => {
+                console.log('User Data:', data);
+                // 로그인된 상태라면 로그인 버튼의 텍스트를 사용자 이름과 함께 변경
+                if (data.name) {
+                  const loginElement = document.querySelector('.header__menu__item a[href="/login"]');
+                  if (loginElement) {
+                    loginElement.textContent = `${data.name} 님`;
+                    loginElement.href = '/';
+                  }
+                  // 회원 가입 링크를 유저 목록 링크로 변경
+                  const registrationElement = document.querySelector('.header__menu__item a[href="/registration"]');
+                  if (registrationElement) {
+                    registrationElement.textContent = '유저 목록';
+                    registrationElement.href = '/user/list';
+                  }
+                  // 로그아웃 버튼 표시
+                  const logoutElement = document.getElementById('logout');
+                  if (logoutElement) {
+                    logoutElement.style.display = 'flex';
+                  }
+                }
+                // 유저 목록 가져오기
+                fetch('/users')
+                        .then(response => {
+                          if (response.ok) {
+                            return response.json();
+                          } else {
+                            throw new Error('Failed to fetch user list');
+                          }
+                        })
+                        .then(userList => {
+                          const userListElement = document.getElementById('user-list');
+                          userList.forEach(user => {
+                            const listItem = document.createElement('li');
+                            listItem.className = 'user-list__item';
+                            listItem.textContent = `${user.name} (${user.email})`;
+                            userListElement.appendChild(listItem);
+                          });
+                        })
+                        .catch(error => {
+                          console.error('Error fetching user list:', error);
+                        });
+              })
+              .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+              });
+    });
+  </script>
+</html>

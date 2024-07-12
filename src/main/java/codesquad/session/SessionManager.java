@@ -9,13 +9,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SessionManager {
 
 	private static final Map<String, Session> sessions = new ConcurrentHashMap<>();
-	private static final long SESSION_TIMEOUT_MINUTES = 30; // 예: 세션 타임아웃 30분
 	private static final ThreadLocal<String> threadLocalSID = new ThreadLocal<>();
+	private static long SESSION_TIMEOUT_SECOND = 30 * 60; // 예: 세션 타임아웃 30분
 
 	private static String createSession(String key, Object value) {
 		String sessionId = UUID.randomUUID().toString();
 		LocalDateTime creationTime = LocalDateTime.now();
-		LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(SESSION_TIMEOUT_MINUTES);
+		LocalDateTime expirationTime = LocalDateTime.now().plusSeconds(SESSION_TIMEOUT_SECOND);
 		Map<String, Object> attributes = new HashMap<>();
 		attributes.put(key, value);
 		Session session = new Session(attributes, creationTime, expirationTime);
@@ -51,7 +51,7 @@ public class SessionManager {
 	}
 
 	private static boolean isExpired(Session session) {
-		return session == null || (session != null && session.expirationTime().isBefore(LocalDateTime.now()));
+		return session == null || session.expirationTime().isBefore(LocalDateTime.now());
 	}
 
 	private static void removeSession(String sessionId) {
@@ -69,4 +69,8 @@ public class SessionManager {
 	public static void removeThreadLocalSID() {
 		threadLocalSID.remove();
 	}
+
+	public static void setSessionTimeoutSecond(long sessionTimeoutSecond) {SESSION_TIMEOUT_SECOND = sessionTimeoutSecond;}
+
+	public static void removeSession() { removeSession(getThreadLocalSID()); }
 }

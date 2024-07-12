@@ -10,7 +10,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import codesquad.container.Container;
 import codesquad.http.constants.HttpVersion;
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
@@ -18,25 +17,21 @@ import codesquad.http.mapper.HttpDynamicHandlerMapper;
 import codesquad.http.mapper.HttpStaticHandlerMapper;
 import codesquad.http.parser.HttpRequestParser;
 import codesquad.http.status.HttpStatusException;
+import codesquad.session.SessionManager;
 
-public class WebWorker implements Runnable {
+public class WebWorker {
 
 	private static final Logger logger = LoggerFactory.getLogger(WebWorker.class);
 
-	private final Socket socket;
-	private final Container container;
 	private final HttpDynamicHandlerMapper httpDynamicHandlerMapper;
 	private final HttpStaticHandlerMapper httpStaticHandlerMapper;
 
-	public WebWorker(Socket clientSocket) {
-		socket = clientSocket;
-		container = Container.getInstance();
-		httpDynamicHandlerMapper = container.getHttpDynamicHandlerMapper();
-		httpStaticHandlerMapper = container.getHttpStaticHandlerMapper();
+	public WebWorker(HttpDynamicHandlerMapper httpDynamicHandlerMapper, HttpStaticHandlerMapper httpStaticHandlerMapper) {
+		this.httpDynamicHandlerMapper = httpDynamicHandlerMapper;
+		this.httpStaticHandlerMapper = httpStaticHandlerMapper;
 	}
 
-	@Override
-	public void run() {
+	public void process(Socket socket) {
 		try (OutputStream clientOutput = socket.getOutputStream();
 			 BufferedReader clientInputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 			// 클라이언트 연결 로그 출력
@@ -45,7 +40,7 @@ public class WebWorker implements Runnable {
 			try {
 				// HTTP Request
 				HttpRequest httpRequest = HttpRequestParser.parse(clientInputReader);
-				logger.debug(httpRequest.toString());
+				logger.debug(httpRequest.path());
 
 				// HTTP Response
 				// Dynamic
@@ -66,6 +61,8 @@ public class WebWorker implements Runnable {
 			clientOutput.flush();
 		} catch (IOException e) {
 			logger.error("클라이언트 소켓의 예외 발생: ", e);
+		} finally {
+			SessionManager.removeThreadLocalSID();
 		}
 	}
 }

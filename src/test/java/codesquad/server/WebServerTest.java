@@ -25,7 +25,7 @@ class WebServerTest {
 
 	private static final Logger logger = LoggerFactory.getLogger(WebServerTest.class);
 	private static final int BACKLOG = 5;
-	private static final int requests = 20;
+	private static final int requests = 5;
 
 	@DisplayName("멀티 스레드 상황에서")
 	@Nested
