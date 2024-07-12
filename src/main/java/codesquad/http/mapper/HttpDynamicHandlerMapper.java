@@ -14,11 +14,9 @@ import codesquad.http.status.HttpStatusException;
 public class HttpDynamicHandlerMapper {
 
 	private final Map<HttpEndPoint, Function<HttpRequest, HttpResponse>> handlers;
-	private final HttpHandlerRegistry registry;
 	private final HttpHandleType type = HttpHandleType.DYNAMIC;
 
 	public HttpDynamicHandlerMapper(HttpHandlerRegistry registry) {
-		this.registry = registry;
 		handlers = registry.getHandlers(type);
 	}
 
