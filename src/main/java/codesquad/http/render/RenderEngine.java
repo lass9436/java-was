@@ -161,11 +161,46 @@ public class RenderEngine {
 				StringBuffer repeatedContent = new StringBuffer();
 				for (Object item : collection) {
 					Map<String, Object> itemModel = Map.of(itemName, item);
-					repeatedContent.append(renderTemplate(content, itemModel));
+					repeatedContent.append(processTemplateContent(content, itemModel));
 				}
 				matcher.appendReplacement(sb, repeatedContent.toString());
 			} else {
 				matcher.appendReplacement(sb, "");
+			}
+		}
+		matcher.appendTail(sb);
+
+		return sb.toString();
+	}
+
+	private String processTemplateContent(String content, Map<String, Object> model) {
+		// if 문 패턴 처리
+		content = processIfStatements(content, model);
+
+		// for 문 패턴 처리
+		content = processForStatements(content, model);
+
+		// {{ key.property }} 패턴을 찾기 위한 정규 표현식
+		Pattern pattern = Pattern.compile("\\{\\{\\s*(\\w+)\\.(\\w+)\\s*\\}\\}");
+		Matcher matcher = pattern.matcher(content);
+
+		StringBuffer sb = new StringBuffer();
+		while (matcher.find()) {
+			String modelKey = matcher.group(1);
+			String property = matcher.group(2);
+
+			Object modelObject = model.get(modelKey);
+			if (modelObject != null) {
+				try {
+					Method getterMethod = modelObject.getClass().getMethod("get" + capitalize(property));
+					Object value = getterMethod.invoke(modelObject);
+					matcher.appendReplacement(sb, value != null ? value.toString() : "");
+				} catch (Exception e) {
+					e.printStackTrace();
+					matcher.appendReplacement(sb, ""); // 에러 발생 시 빈 문자열로 대체
+				}
+			} else {
+				matcher.appendReplacement(sb, ""); // 모델 객체가 없을 경우 빈 문자열로 대체
 			}
 		}
 		matcher.appendTail(sb);
