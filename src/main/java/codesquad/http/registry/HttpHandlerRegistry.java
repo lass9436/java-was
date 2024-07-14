@@ -21,8 +21,7 @@ import codesquad.http.annotation.HttpFunction;
 import codesquad.http.annotation.HttpHandler;
 import codesquad.http.constants.HttpHandleType;
 import codesquad.http.dto.HttpEndPoint;
-import codesquad.http.dto.HttpRequest;
-import codesquad.http.dto.HttpResponse;
+import codesquad.http.render.RenderData;
 
 public class HttpHandlerRegistry {
 
@@ -30,8 +29,8 @@ public class HttpHandlerRegistry {
 
 	private final String packageName = "codesquad.http.handler";
 
-	public Map<HttpEndPoint, Function<HttpRequest, HttpResponse>> getHandlers(HttpHandleType type) {
-		Map<HttpEndPoint, Function<HttpRequest, HttpResponse>> handlers = new HashMap<>();
+	public Map<HttpEndPoint, Function<Void, RenderData>> getHandlers(HttpHandleType type) {
+		Map<HttpEndPoint, Function<Void, RenderData>> handlers = new HashMap<>();
 		try {
 			Class<?>[] classes = getClasses(packageName);
 			Arrays.stream(classes)
@@ -43,7 +42,7 @@ public class HttpHandlerRegistry {
 		return handlers;
 	}
 
-	private void registerHandlerMethods(Map<HttpEndPoint, Function<HttpRequest, HttpResponse>> handlers,
+	private void registerHandlerMethods(Map<HttpEndPoint, Function<Void, RenderData>> handlers,
 		Class<?> handlerClass, HttpHandleType type) {
 		try {
 			Object handlerInstance = handlerClass.getDeclaredConstructor().newInstance();
@@ -53,8 +52,7 @@ public class HttpHandlerRegistry {
 					HttpFunction httpFunction = method.getAnnotation(HttpFunction.class);
 					if (httpFunction.type() == type) {
 						HttpEndPoint endPoint = new HttpEndPoint(httpFunction.path(), httpFunction.method());
-						Function<HttpRequest, HttpResponse> handlerFunction = createHandlerFunction(handlerInstance,
-							method);
+						Function<Void, RenderData> handlerFunction = createHandlerFunction(handlerInstance, method);
 						handlers.put(endPoint, handlerFunction);
 					}
 				});
@@ -63,10 +61,10 @@ public class HttpHandlerRegistry {
 		}
 	}
 
-	private Function<HttpRequest, HttpResponse> createHandlerFunction(Object handlerInstance, Method method) {
-		return (request) -> {
+	private Function<Void, RenderData> createHandlerFunction(Object handlerInstance, Method method) {
+		return (unused) -> {
 			try {
-				return (HttpResponse)method.invoke(handlerInstance, request);
+				return (RenderData)method.invoke(handlerInstance);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
