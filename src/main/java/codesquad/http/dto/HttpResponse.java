@@ -64,6 +64,13 @@ public class HttpResponse {
 		this.body = body;
 	}
 
+	public void setResponse(HttpVersion version, HttpStatus status, Map<String, List<String>> headers, byte[] body) {
+		this.version = version;
+		this.status = status;
+		this.headers = headers;
+		this.body = body;
+	}
+
 	public byte[] getBytes() {
 		StringBuilder response = new StringBuilder();
 		response.append(version.getVersion())
