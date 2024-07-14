@@ -2,6 +2,7 @@ package codesquad.http.dto;
 
 import static codesquad.utils.StringConstants.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -14,6 +15,13 @@ public class HttpResponse {
 	private HttpStatus status;
 	private Map<String, List<String>> headers;
 	private byte[] body;
+
+	public HttpResponse() {
+		this.version = HttpVersion.HTTP_1_1;
+		this.status = HttpStatus.OK;
+		this.headers = new HashMap<>();
+		this.body = null;
+	}
 
 	public HttpResponse(HttpVersion version, HttpStatus status, Map<String, List<String>> headers, byte[] body) {
 		this.version = version;

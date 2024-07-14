@@ -1,5 +1,6 @@
 package codesquad.http.dto;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -14,6 +15,15 @@ public class HttpRequest {
 	private Map<String, List<String>> headers;
 	private Map<String, List<String>> parameters;
 	private Map<String, List<String>> body;
+
+	public HttpRequest() {
+		method = HttpMethod.GET;
+		path = "/";
+		version = HttpVersion.HTTP_1_1;
+		headers = new HashMap<>();
+		parameters = new HashMap<>();
+		body = new HashMap<>();
+	}
 
 	public HttpRequest(HttpMethod method, String path, HttpVersion version,
 		Map<String, List<String>> headers, Map<String, List<String>> parameters,
