@@ -1,5 +1,6 @@
 package codesquad.container;
 
+import codesquad.http.filter.FilterChain;
 import codesquad.http.mapper.HttpDynamicHandlerMapper;
 import codesquad.http.mapper.HttpStaticHandlerMapper;
 import codesquad.http.registry.HttpHandlerRegistry;
@@ -10,6 +11,7 @@ public class Container {
 
 	private static Container instance;
 
+	private final FilterChain filterChain;
 	private final HttpStaticHandlerMapper httpStaticHandlerMapper;
 	private final HttpDynamicHandlerMapper httpDynamicHandlerMapper;
 	private final HttpHandlerRegistry httpHandlerRegistry;
@@ -17,11 +19,12 @@ public class Container {
 	private final WebWorker webWorker;
 
 	private Container() {
+		this.filterChain = new FilterChain();
 		this.httpHandlerRegistry = new HttpHandlerRegistry();
 		this.httpDynamicHandlerMapper = new HttpDynamicHandlerMapper(httpHandlerRegistry);
 		this.httpStaticHandlerMapper = new HttpStaticHandlerMapper();
 		this.renderEngine = new RenderEngine();
-		this.webWorker = new WebWorker(httpDynamicHandlerMapper, httpStaticHandlerMapper, renderEngine);
+		this.webWorker = new WebWorker(filterChain, httpDynamicHandlerMapper, httpStaticHandlerMapper, renderEngine);
 	}
 
 	public static Container getInstance() {

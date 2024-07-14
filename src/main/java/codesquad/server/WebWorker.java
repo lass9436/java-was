@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.Map;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -14,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import codesquad.http.constants.HttpVersion;
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
+import codesquad.http.filter.FilterChain;
 import codesquad.http.mapper.HttpDynamicHandlerMapper;
 import codesquad.http.mapper.HttpStaticHandlerMapper;
 import codesquad.http.parser.HttpRequestParser;
@@ -29,14 +29,16 @@ public class WebWorker {
 	public static final ThreadLocal<HttpRequest> HTTP_REQUEST_THREAD_LOCAL = new ThreadLocal<>();
 	public static final ThreadLocal<HttpResponse> HTTP_RESPONSE_THREAD_LOCAL = new ThreadLocal<>();
 
+	private final FilterChain filterChain;
 	private final HttpDynamicHandlerMapper httpDynamicHandlerMapper;
 	private final HttpStaticHandlerMapper httpStaticHandlerMapper;
 	private final RenderEngine renderEngine;
 
-	public WebWorker(HttpDynamicHandlerMapper httpDynamicHandlerMapper,
+	public WebWorker(FilterChain filterChain, HttpDynamicHandlerMapper httpDynamicHandlerMapper,
 		HttpStaticHandlerMapper httpStaticHandlerMapper,
 		RenderEngine renderEngine
 	) {
+		this.filterChain = filterChain;
 		this.httpDynamicHandlerMapper = httpDynamicHandlerMapper;
 		this.httpStaticHandlerMapper = httpStaticHandlerMapper;
 		this.renderEngine = renderEngine;
@@ -51,10 +53,13 @@ public class WebWorker {
 			HTTP_REQUEST_THREAD_LOCAL.set(new HttpRequest());
 			HTTP_RESPONSE_THREAD_LOCAL.set(new HttpResponse());
 			try {
-				// HTTP Request
+				// HTTP Request Parse
 				HTTP_REQUEST_THREAD_LOCAL.set(HttpRequestParser.parse(clientInputReader));
 				HttpRequest httpRequest = HTTP_REQUEST_THREAD_LOCAL.get();
 				logger.info("{} {}", httpRequest.getMethod(), httpRequest.getPath());
+
+				// Filter Chain
+				filterChain.doFilter();
 
 				// find handler
 				Function<Void, RenderData> handler = httpDynamicHandlerMapper.findHandler();
@@ -74,7 +79,7 @@ public class WebWorker {
 
 			} catch (HttpStatusException e) {
 				logger.error("HTTP 상태 코드 예외 발생: ", e);
-				HttpResponse httpResponse = new HttpResponse(HttpVersion.HTTP_1_1, e.getStatus(), Map.of(),
+				HttpResponse httpResponse = new HttpResponse(HttpVersion.HTTP_1_1, e.getStatus(), e.getHeaders(),
 					e.getStatus().getReasonPhrase().getBytes());
 				clientOutput.write(httpResponse.getBytes());
 			}
