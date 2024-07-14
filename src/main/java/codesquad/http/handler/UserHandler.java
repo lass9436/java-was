@@ -44,7 +44,7 @@ public class UserHandler {
 		userRepository.create(user);
 
 		logger.info("Creating user: {}", user);
-		Map<String, List<String>> headers = Map.of("Location", List.of("/index.html"));
+		Map<String, List<String>> headers = Map.of("Location", List.of("/"));
 		httpResponse.setResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND, headers, new byte[0]);
 
 		return null;
@@ -63,7 +63,7 @@ public class UserHandler {
 			if (user.getPassword().equals(password)) {
 				String sessionId = SessionManager.putSession("user", user);
 				Map<String, List<String>> headers = Map.of(
-					"Location", List.of("/index.html"),
+					"Location", List.of("/"),
 					"Set-Cookie", List.of("SID=" + sessionId + "; Path=/")
 				);
 				httpResponse.setResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND, headers, new byte[0]);
