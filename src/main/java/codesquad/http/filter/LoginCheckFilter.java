@@ -21,5 +21,10 @@ public class LoginCheckFilter implements Filter {
 			throw new HttpStatusException(HttpStatus.FOUND, "로그인한 사용자만 접근할 수 있습니다.",
 				(Map.of("Location", List.of("/"))));
 		}
+
+		if (user == null && "/user/write".equals(request.getPath())) {
+			throw new HttpStatusException(HttpStatus.FOUND, "로그인한 사용자만 접근할 수 있습니다.",
+				(Map.of("Location", List.of("/login"))));
+		}
 	}
 }
