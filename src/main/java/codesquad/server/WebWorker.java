@@ -10,15 +10,17 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import codesquad.http.constants.HttpVersion;
+import codesquad.http.constants.HttpMethod;
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
 import codesquad.http.filter.FilterChain;
 import codesquad.http.mapper.HttpDynamicHandlerMapper;
+import codesquad.http.mapper.HttpErrorHandlerMapper;
 import codesquad.http.mapper.HttpStaticHandlerMapper;
 import codesquad.http.parser.HttpRequestParser;
 import codesquad.http.render.RenderData;
 import codesquad.http.render.RenderEngine;
+import codesquad.http.status.HttpStatus;
 import codesquad.http.status.HttpStatusException;
 import codesquad.session.SessionManager;
 
@@ -32,17 +34,19 @@ public class WebWorker {
 	private final FilterChain filterChain;
 	private final HttpDynamicHandlerMapper httpDynamicHandlerMapper;
 	private final HttpStaticHandlerMapper httpStaticHandlerMapper;
+	private final HttpErrorHandlerMapper httpErrorHandlerMapper;
 	private final RenderEngine renderEngine;
 
 	public WebWorker(FilterChain filterChain, HttpDynamicHandlerMapper httpDynamicHandlerMapper,
 		HttpStaticHandlerMapper httpStaticHandlerMapper,
+		HttpErrorHandlerMapper httpErrorHandlerMapper,
 		RenderEngine renderEngine
 	) {
 		this.filterChain = filterChain;
 		this.httpDynamicHandlerMapper = httpDynamicHandlerMapper;
 		this.httpStaticHandlerMapper = httpStaticHandlerMapper;
+		this.httpErrorHandlerMapper = httpErrorHandlerMapper;
 		this.renderEngine = renderEngine;
-
 	}
 
 	public void process(Socket socket) {
@@ -64,6 +68,11 @@ public class WebWorker {
 				// find handler
 				Function<Void, RenderData> handler = httpDynamicHandlerMapper.findHandler();
 
+				// 405 Method Not Allowed 처리
+				if (handler == null && httpRequest.getMethod() != HttpMethod.GET) {
+					throw new HttpStatusException(HttpStatus.METHOD_NOT_ALLOWED, "지원되지 않는 HTTP 메서드입니다");
+				}
+
 				// static handle
 				if (handler == null) {
 					HTTP_RESPONSE_THREAD_LOCAL.set(httpStaticHandlerMapper.handle());
@@ -79,8 +88,7 @@ public class WebWorker {
 
 			} catch (HttpStatusException e) {
 				logger.error("HTTP 상태 코드 예외 발생: ", e);
-				HttpResponse httpResponse = new HttpResponse(HttpVersion.HTTP_1_1, e.getStatus(), e.getHeaders(),
-					e.getStatus().getReasonPhrase().getBytes());
+				HttpResponse httpResponse = httpErrorHandlerMapper.handle(e);
 				clientOutput.write(httpResponse.getBytes());
 			}
 			// write flush
