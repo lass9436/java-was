@@ -28,6 +28,7 @@ jar {
 dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.0'  // SLF4J API
     implementation 'ch.qos.logback:logback-classic:1.3.0'  // Logback Classic
+    implementation 'com.h2database:h2:2.1.214'
 
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
