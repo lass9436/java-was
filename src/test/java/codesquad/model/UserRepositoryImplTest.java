@@ -8,85 +8,86 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import codesquad.http.status.HttpStatusException;
+class UserRepositoryImplTest {
 
-class UserRepositoryTest {
-
-	private static UserRepository userRepository;
+	private static UserRepositoryImpl userRepositoryImpl;
 
 	@BeforeAll
 	static void setUp() {
-		userRepository = new UserRepository();
+		userRepositoryImpl = new UserRepositoryImpl();
 	}
 
 	@Test
 	void 유저_생성_테스트() {
 		User user = new User("user1", "password1", "User One", "user1@example.com");
-		User createdUser = userRepository.create(user);
+		User createdUser = userRepositoryImpl.create(user);
 		assertEquals(user, createdUser);
-		assertEquals(user, userRepository.findById("user1"));
+		assertEquals(user, userRepositoryImpl.findById("user1"));
 	}
 
 	@Test
 	void 유저_중복_생성_테스트() {
 		User user = new User("user1", "password1", "User One", "user1@example.com");
-		userRepository.create(user);
-		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> userRepository.create(user));
+		userRepositoryImpl.create(user);
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+			() -> userRepositoryImpl.create(user));
 		assertEquals("User with id user1 already exists", exception.getMessage());
 	}
 
 	@Test
 	void 유저_ID_로_조회_테스트() {
 		User user = new User("user1", "password1", "User One", "user1@example.com");
-		userRepository.create(user);
-		User foundUser = userRepository.findById("user1");
+		userRepositoryImpl.create(user);
+		User foundUser = userRepositoryImpl.findById("user1");
 		assertEquals(user, foundUser);
 	}
 
 	@Test
 	void 존재하지_않는_유저_조회_테스트() {
 		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-			() -> userRepository.findById("nonexistent"));
+			() -> userRepositoryImpl.findById("nonexistent"));
 		assertEquals("User with id nonexistent does not exist", exception.getMessage());
 	}
 
 	@Test
 	void 유저_업데이트_테스트() {
 		User user = new User("user1", "password1", "User One", "user1@example.com");
-		userRepository.create(user);
+		userRepositoryImpl.create(user);
 		User updatedUser = new User("user1", "password2", "User One Updated", "user1updated@example.com");
-		User returnedUser = userRepository.update(updatedUser);
+		User returnedUser = userRepositoryImpl.update(updatedUser);
 		assertEquals(updatedUser, returnedUser);
-		assertEquals(updatedUser, userRepository.findById("user1"));
+		assertEquals(updatedUser, userRepositoryImpl.findById("user1"));
 	}
 
 	@Test
 	void 존재하지_않는_유저_업데이트_테스트() {
 		User user = new User("user1", "password1", "User One", "user1@example.com");
-		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> userRepository.update(user));
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+			() -> userRepositoryImpl.update(user));
 		assertEquals("User with id user1 does not exist", exception.getMessage());
 	}
 
 	@Test
 	void 유저_삭제_테스트() {
 		User user = new User("user1", "password1", "User One", "user1@example.com");
-		userRepository.create(user);
-		userRepository.delete("user1");
-		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> userRepository.findById("user1"));
+		userRepositoryImpl.create(user);
+		userRepositoryImpl.delete("user1");
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+			() -> userRepositoryImpl.findById("user1"));
 		assertEquals("User with id user1 does not exist", exception.getMessage());
 	}
 
 	@Test
 	void 존재하지_않는_유저_삭제_테스트() {
 		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-			() -> userRepository.delete("nonexistent"));
+			() -> userRepositoryImpl.delete("nonexistent"));
 		assertEquals("User with id nonexistent does not exist", exception.getMessage());
 	}
 
 	@Test
 	void 여러_인스턴스_공유_저장소_테스트() {
-		UserRepository repo1 = new UserRepository();
-		UserRepository repo2 = new UserRepository();
+		UserRepositoryImpl repo1 = new UserRepositoryImpl();
+		UserRepositoryImpl repo2 = new UserRepositoryImpl();
 
 		User user1 = new User("user1", "password1", "User One", "user1@example.com");
 		User user2 = new User("user2", "password2", "User Two", "user2@example.com");
@@ -100,9 +101,9 @@ class UserRepositoryTest {
 
 	@AfterEach
 	void tearDown() {
-		List<User> users = userRepository.findAll();
+		List<User> users = userRepositoryImpl.findAll();
 		for (User user : users) {
-			userRepository.delete(user.userId());
+			userRepositoryImpl.delete(user.getUserId());
 		}
 	}
 }
