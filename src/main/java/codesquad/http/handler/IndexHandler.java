@@ -9,8 +9,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import codesquad.http.annotation.HttpFunction;
-import codesquad.http.annotation.HttpHandler;
+import codesquad.annotation.HttpFunction;
+import codesquad.annotation.HttpHandler;
 import codesquad.http.constants.HttpHandleType;
 import codesquad.http.constants.HttpMethod;
 import codesquad.http.render.RenderData;
@@ -22,7 +22,11 @@ public class IndexHandler {
 
 	private final Logger logger = LoggerFactory.getLogger(IndexHandler.class);
 
-	private final UserRepository userRepository = new UserRepository();
+	private final UserRepository userRepository;
+
+	public IndexHandler(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
 
 	@HttpFunction(path = "/", method = HttpMethod.GET, type = HttpHandleType.DYNAMIC)
 	public RenderData handleIndex() {

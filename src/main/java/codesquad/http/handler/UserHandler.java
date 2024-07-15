@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import codesquad.http.annotation.HttpFunction;
-import codesquad.http.annotation.HttpHandler;
+import codesquad.annotation.HttpFunction;
+import codesquad.annotation.HttpHandler;
 import codesquad.http.constants.HttpHandleType;
 import codesquad.http.constants.HttpMethod;
 import codesquad.http.constants.HttpVersion;
@@ -27,7 +27,11 @@ public class UserHandler {
 
 	private final Logger logger = LoggerFactory.getLogger(UserHandler.class);
 
-	private final UserRepository userRepository = new UserRepository();
+	private final UserRepository userRepository;
+
+	public UserHandler(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
 
 	@HttpFunction(path = "/create", method = HttpMethod.POST, type = HttpHandleType.DYNAMIC)
 	public RenderData join() {
