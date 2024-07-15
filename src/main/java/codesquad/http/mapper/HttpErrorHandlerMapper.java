@@ -21,6 +21,10 @@ public class HttpErrorHandlerMapper {
 	);
 
 	public HttpResponse handle(HttpStatusException e) {
+		if (e.getStatus() == HttpStatus.FOUND) {
+			return new HttpResponse(HttpVersion.HTTP_1_1, e.getStatus(), e.getHeaders(), e.getMessage().getBytes());
+		}
+
 		HttpStatus status = e.getStatus();
 		String errorPage = ERROR_PAGE_MAPPING.getOrDefault(status, "500.html");
 		String resourcePath = ERROR_PAGES_PATH + errorPage;
