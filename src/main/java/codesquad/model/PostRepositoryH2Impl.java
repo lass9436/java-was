@@ -21,7 +21,7 @@ public class PostRepositoryH2Impl implements PostRepository {
 			 PreparedStatement statement = connection.prepareStatement(query,
 				 PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-			statement.setInt(1, Integer.parseInt(post.getUserId()));
+			statement.setString(1, post.getUserId());
 			statement.setString(2, post.getUsername());
 			statement.setString(3, post.getTitle());
 			statement.setString(4, post.getContent());
