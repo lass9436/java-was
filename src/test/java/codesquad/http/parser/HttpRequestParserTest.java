@@ -92,17 +92,17 @@ class HttpRequestParserTest {
 			BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
 			HttpRequest httpRequest = HttpRequestParser.parse(reader);
 
-			assertEquals(HttpMethod.GET, httpRequest.method());
-			assertEquals("/index.html", httpRequest.path());
-			assertEquals(HttpVersion.HTTP_1_1, httpRequest.version());
-			assertEquals("localhost:8080", httpRequest.headers().get("Host").get(0));
-			assertEquals("keep-alive", httpRequest.headers().get("Connection").get(0));
-			assertTrue(httpRequest.headers().get("Accept").contains("text/html"));
-			assertTrue(httpRequest.headers().get("Accept").contains("application/xhtml+xml"));
-			assertTrue(httpRequest.headers().get("Accept").contains("application/xml;q=0.9"));
-			assertTrue(httpRequest.headers().get("Accept").contains("image/webp"));
-			assertTrue(httpRequest.headers().get("Accept").contains("image/apng"));
-			assertTrue(httpRequest.headers().get("Accept").contains("*/*;q=0.8"));
+			assertEquals(HttpMethod.GET, httpRequest.getMethod());
+			assertEquals("/index.html", httpRequest.getPath());
+			assertEquals(HttpVersion.HTTP_1_1, httpRequest.getVersion());
+			assertEquals("localhost:8080", httpRequest.getHeaders().get("Host").get(0));
+			assertEquals("keep-alive", httpRequest.getHeaders().get("Connection").get(0));
+			assertTrue(httpRequest.getHeaders().get("Accept").contains("text/html"));
+			assertTrue(httpRequest.getHeaders().get("Accept").contains("application/xhtml+xml"));
+			assertTrue(httpRequest.getHeaders().get("Accept").contains("application/xml;q=0.9"));
+			assertTrue(httpRequest.getHeaders().get("Accept").contains("image/webp"));
+			assertTrue(httpRequest.getHeaders().get("Accept").contains("image/apng"));
+			assertTrue(httpRequest.getHeaders().get("Accept").contains("*/*;q=0.8"));
 		}
 	}
 
@@ -126,15 +126,15 @@ class HttpRequestParserTest {
 			HttpRequest httpRequest = HttpRequestParser.parse(reader);
 
 			// 요청 라인 검증
-			assertEquals(HttpMethod.POST, httpRequest.method());
-			assertEquals("/submit", httpRequest.path());
-			assertEquals(HttpVersion.HTTP_1_1, httpRequest.version());
+			assertEquals(HttpMethod.POST, httpRequest.getMethod());
+			assertEquals("/submit", httpRequest.getPath());
+			assertEquals(HttpVersion.HTTP_1_1, httpRequest.getVersion());
 
 			// 헤더 검증
-			assertEquals("localhost:8080", httpRequest.headers().get("Host").get(0));
-			assertEquals("keep-alive", httpRequest.headers().get("Connection").get(0));
-			assertEquals("application/json", httpRequest.headers().get("Content-Type").get(0));
-			assertEquals(String.valueOf(jsonBodyBytes.length), httpRequest.headers().get("Content-Length").get(0));
+			assertEquals("localhost:8080", httpRequest.getHeaders().get("Host").get(0));
+			assertEquals("keep-alive", httpRequest.getHeaders().get("Connection").get(0));
+			assertEquals("application/json", httpRequest.getHeaders().get("Content-Type").get(0));
+			assertEquals(String.valueOf(jsonBodyBytes.length), httpRequest.getHeaders().get("Content-Length").get(0));
 
 			// 바디 검증
 			Map<String, List<String>> expectedBody = Map.of(
@@ -142,7 +142,7 @@ class HttpRequestParserTest {
 				"age", List.of("30"),
 				"email", List.of("john@email.com")
 			);
-			assertEquals(expectedBody, httpRequest.body());
+			assertEquals(expectedBody, httpRequest.getBody());
 		}
 
 		@Test
@@ -162,22 +162,22 @@ class HttpRequestParserTest {
 			HttpRequest httpRequest = HttpRequestParser.parse(reader);
 
 			// 요청 라인 검증
-			assertEquals(HttpMethod.POST, httpRequest.method());
-			assertEquals("/submit", httpRequest.path());
-			assertEquals(HttpVersion.HTTP_1_1, httpRequest.version());
+			assertEquals(HttpMethod.POST, httpRequest.getMethod());
+			assertEquals("/submit", httpRequest.getPath());
+			assertEquals(HttpVersion.HTTP_1_1, httpRequest.getVersion());
 
 			// 헤더 검증
-			assertEquals("localhost:8080", httpRequest.headers().get("Host").get(0));
-			assertEquals("keep-alive", httpRequest.headers().get("Connection").get(0));
-			assertEquals("application/x-www-form-urlencoded", httpRequest.headers().get("Content-Type").get(0));
-			assertEquals(String.valueOf(formBodyBytes.length), httpRequest.headers().get("Content-Length").get(0));
+			assertEquals("localhost:8080", httpRequest.getHeaders().get("Host").get(0));
+			assertEquals("keep-alive", httpRequest.getHeaders().get("Connection").get(0));
+			assertEquals("application/x-www-form-urlencoded", httpRequest.getHeaders().get("Content-Type").get(0));
+			assertEquals(String.valueOf(formBodyBytes.length), httpRequest.getHeaders().get("Content-Length").get(0));
 
 			// 바디 검증
 			Map<String, List<String>> expectedBody = Map.of(
 				"name", List.of("John"),
 				"age", List.of("30")
 			);
-			assertEquals(expectedBody, httpRequest.body());
+			assertEquals(expectedBody, httpRequest.getBody());
 		}
 
 		@Test
@@ -197,22 +197,22 @@ class HttpRequestParserTest {
 			HttpRequest httpRequest = HttpRequestParser.parse(reader);
 
 			// 요청 라인 검증
-			assertEquals(HttpMethod.POST, httpRequest.method());
-			assertEquals("/submit", httpRequest.path());
-			assertEquals(HttpVersion.HTTP_1_1, httpRequest.version());
+			assertEquals(HttpMethod.POST, httpRequest.getMethod());
+			assertEquals("/submit", httpRequest.getPath());
+			assertEquals(HttpVersion.HTTP_1_1, httpRequest.getVersion());
 
 			// 헤더 검증
-			assertEquals("localhost:8080", httpRequest.headers().get("Host").get(0));
-			assertEquals("keep-alive", httpRequest.headers().get("Connection").get(0));
-			assertEquals("application/x-www-form-urlencoded", httpRequest.headers().get("Content-Type").get(0));
-			assertEquals(String.valueOf(formBodyBytes.length), httpRequest.headers().get("Content-Length").get(0));
+			assertEquals("localhost:8080", httpRequest.getHeaders().get("Host").get(0));
+			assertEquals("keep-alive", httpRequest.getHeaders().get("Connection").get(0));
+			assertEquals("application/x-www-form-urlencoded", httpRequest.getHeaders().get("Content-Type").get(0));
+			assertEquals(String.valueOf(formBodyBytes.length), httpRequest.getHeaders().get("Content-Length").get(0));
 
 			// 바디 검증
 			Map<String, List<String>> expectedBody = Map.of(
 				"name", List.of("John", "Jane"),
 				"age", List.of("30")
 			);
-			assertEquals(expectedBody, httpRequest.body());
+			assertEquals(expectedBody, httpRequest.getBody());
 		}
 	}
 
