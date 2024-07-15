@@ -48,7 +48,7 @@ public class PostApiHandler {
 		String title = body.get("title").get(0);
 		String content = body.get("content").get(0);
 
-		Post post = new Post(user.getUserId(), user.getName(), title, content);
+		Post post = new Post(user.getUserId(), title, content);
 		postRepository.create(post);
 
 		httpResponse.setResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND,

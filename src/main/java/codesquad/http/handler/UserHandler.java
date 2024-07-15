@@ -14,6 +14,8 @@ import codesquad.annotation.HttpHandler;
 import codesquad.http.constants.HttpHandleType;
 import codesquad.http.constants.HttpMethod;
 import codesquad.http.render.RenderData;
+import codesquad.model.Post;
+import codesquad.model.PostRepository;
 import codesquad.model.User;
 import codesquad.model.UserRepository;
 
@@ -23,9 +25,11 @@ public class UserHandler {
 	private final Logger logger = LoggerFactory.getLogger(UserHandler.class);
 
 	private final UserRepository userRepository;
+	private final PostRepository postRepository;
 
-	public UserHandler(UserRepository userRepository) {
+	public UserHandler(UserRepository userRepository, PostRepository postRepository) {
 		this.userRepository = userRepository;
+		this.postRepository = postRepository;
 	}
 
 	@HttpFunction(path = "/", method = HttpMethod.GET, type = HttpHandleType.DYNAMIC)
@@ -34,6 +38,10 @@ public class UserHandler {
 		User user = (User)getSession("user");
 		Map<String, Object> model = new HashMap<>();
 		model.put("user", user);
+
+		// 글 목록 획득
+		List<Post> posts = postRepository.findAll();
+		model.put("posts", posts);
 
 		// RenderData 객체를 생성하여 뷰 이름과 모델을 설정합니다.
 		RenderData renderData = new RenderData("/index");

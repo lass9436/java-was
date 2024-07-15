@@ -15,16 +15,15 @@ public class PostRepositoryH2Impl implements PostRepository {
 
 	@Override
 	public Post create(Post post) {
-		String query = "INSERT INTO posts (user_id, username, title, content) VALUES (?, ?, ?, ?)";
+		String query = "INSERT INTO posts (username, title, content) VALUES (?, ?, ?)";
 
 		try (Connection connection = Database.getConnection();
 			 PreparedStatement statement = connection.prepareStatement(query,
 				 PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-			statement.setString(1, post.getUserId());
-			statement.setString(2, post.getUsername());
-			statement.setString(3, post.getTitle());
-			statement.setString(4, post.getContent());
+			statement.setString(1, post.getUsername());
+			statement.setString(2, post.getTitle());
+			statement.setString(3, post.getContent());
 
 			int affectedRows = statement.executeUpdate();
 
@@ -56,12 +55,13 @@ public class PostRepositoryH2Impl implements PostRepository {
 
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (resultSet.next()) {
-					return new Post(
-						resultSet.getString("user_id"),
+					Post post = new Post(
 						resultSet.getString("username"),
 						resultSet.getString("title"),
 						resultSet.getString("content")
 					);
+					post.setId(resultSet.getInt("id"));
+					return post;
 				}
 			}
 		} catch (SQLException e) {
@@ -114,7 +114,6 @@ public class PostRepositoryH2Impl implements PostRepository {
 
 			while (resultSet.next()) {
 				Post post = new Post(
-					resultSet.getString("user_id"),
 					resultSet.getString("username"),
 					resultSet.getString("title"),
 					resultSet.getString("content")
