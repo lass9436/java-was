@@ -1,5 +1,6 @@
 package codesquad.container;
 
+import codesquad.database.Database;
 import codesquad.http.filter.FilterChain;
 import codesquad.http.mapper.HttpDynamicHandlerMapper;
 import codesquad.http.mapper.HttpErrorHandlerMapper;
@@ -21,6 +22,7 @@ public class Container {
 	private final WebWorker webWorker;
 
 	private Container() {
+		Database.initializeDatabase();
 		this.filterChain = new FilterChain();
 		this.httpHandlerRegistry = new HttpHandlerRegistry();
 		this.httpDynamicHandlerMapper = new HttpDynamicHandlerMapper(httpHandlerRegistry);
