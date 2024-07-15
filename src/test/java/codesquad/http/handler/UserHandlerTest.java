@@ -13,25 +13,27 @@ import codesquad.http.dto.HttpResponse;
 import codesquad.http.parser.HttpRequestParser;
 import codesquad.http.status.HttpStatus;
 import codesquad.model.User;
-import codesquad.model.UserRepository;
+import codesquad.model.UserRepositoryImpl;
+import codesquad.server.WebWorker;
+import codesquad.utils.StringConstants;
 
 public class UserHandlerTest {
 
 	private static UserHandler userHandler;
-	private static UserRepository userRepository;
+	private static UserRepositoryImpl userRepositoryImpl;
 
 	@BeforeAll
 	public static void setUp() {
-		userHandler = new UserHandler();
-		userRepository = new UserRepository();
+		userRepositoryImpl = new UserRepositoryImpl();
+		userHandler = new UserHandler(userRepositoryImpl);
 	}
 
 	@Test
 	public void 사용자_생성_성공() throws Exception {
 		String jsonBody = "{ \"userId\": \"john_doe\", \"password\": \"password123\", \"name\": \"John Doe\", \"email\": \"john@example.com\" }";
-		byte[] jsonBodyBytes = jsonBody.getBytes("UTF-8");
+		byte[] jsonBodyBytes = jsonBody.getBytes(StringConstants.UTF8);
 		String httpRequestString =
-			"POST /join HTTP/1.1\r\n" +
+			"POST /create HTTP/1.1\r\n" +
 				"Host: localhost:8080\r\n" +
 				"Connection: keep-alive\r\n" +
 				"Content-Type: application/json\r\n" +
@@ -42,16 +44,28 @@ public class UserHandlerTest {
 		BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
 		HttpRequest request = HttpRequestParser.parse(reader);
 
-		HttpResponse response = userHandler.join(request);
+		// 스레드 로컬에 요청과 응답 설정
+		WebWorker.HTTP_REQUEST_THREAD_LOCAL.set(request);
+		HttpResponse response = new HttpResponse();
+		WebWorker.HTTP_RESPONSE_THREAD_LOCAL.set(response);
 
-		assertEquals(HttpStatus.FOUND.getCode(), response.status().getCode());
-		assertTrue(response.headers().containsKey("Location"));
-		assertEquals("/index.html", response.headers().get("Location").get(0));
+		// 핸들러 메서드 호출
+		userHandler.join();
 
-		User user = userRepository.findById("john_doe");
-		assertEquals("john_doe", user.userId());
-		assertEquals("password123", user.password());
-		assertEquals("John Doe", user.name());
-		assertEquals("john@example.com", user.email());
+		// 응답 검증
+		assertEquals(HttpStatus.FOUND.getCode(), response.getStatus().getCode());
+		assertTrue(response.getHeaders().containsKey("Location"));
+		assertEquals("/", response.getHeaders().get("Location").get(0));
+
+		// 저장소에 사용자가 제대로 생성되었는지 검증
+		User user = userRepositoryImpl.findById("john_doe");
+		assertEquals("john_doe", user.getUserId());
+		assertEquals("password123", user.getPassword());
+		assertEquals("John Doe", user.getName());
+		assertEquals("john@example.com", user.getEmail());
+
+		// 스레드 로컬 변수 정리
+		WebWorker.HTTP_REQUEST_THREAD_LOCAL.remove();
+		WebWorker.HTTP_RESPONSE_THREAD_LOCAL.remove();
 	}
 }

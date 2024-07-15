@@ -14,6 +14,7 @@ import codesquad.http.constants.HttpMethod;
 import codesquad.http.constants.HttpVersion;
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
+import codesquad.server.WebWorker;
 
 @DisplayName("HttpStaticHandler 테스트")
 class HttpStaticHandlerMapperTest {
@@ -27,7 +28,16 @@ class HttpStaticHandlerMapperTest {
 
 	@Test
 	void HttpRequest를_받아_HttpResponse를_반환한다() throws IOException {
-		HttpResponse httpResponse = httpStaticHandlerMapper.handle(new HttpRequest(HttpMethod.GET, "/", HttpVersion.HTTP_1_1, null, null, null));
+		HttpRequest httpRequest = new HttpRequest(HttpMethod.GET, "/", HttpVersion.HTTP_1_1, null, null, null);
+
+		// 스레드 로컬에 요청 설정
+		WebWorker.HTTP_REQUEST_THREAD_LOCAL.set(httpRequest);
+
+		HttpResponse httpResponse = httpStaticHandlerMapper.handle();
+
+		// 스레드 로컬 변수 정리
+		WebWorker.HTTP_REQUEST_THREAD_LOCAL.remove();
+
 		assertNotNull(httpResponse);
 	}
 
@@ -40,14 +50,21 @@ class HttpStaticHandlerMapperTest {
 	})
 	void path에_따라_정적_리소스를_반환한다(String path, int expectedStatusCode, String expectedContentType) {
 		HttpRequest httpRequest = new HttpRequest(HttpMethod.GET, path, HttpVersion.HTTP_1_1, null, null, null);
-		HttpResponse httpResponse = httpStaticHandlerMapper.handle(httpRequest);
 
-		assertEquals(HttpVersion.HTTP_1_1, httpResponse.version());
-		assertEquals(expectedStatusCode, httpResponse.status().getCode());
+		// 스레드 로컬에 요청 설정
+		WebWorker.HTTP_REQUEST_THREAD_LOCAL.set(httpRequest);
+
+		HttpResponse httpResponse = httpStaticHandlerMapper.handle();
+
+		// 스레드 로컬 변수 정리
+		WebWorker.HTTP_REQUEST_THREAD_LOCAL.remove();
+
+		assertEquals(HttpVersion.HTTP_1_1, httpResponse.getVersion());
+		assertEquals(expectedStatusCode, httpResponse.getStatus().getCode());
 		if (!expectedContentType.isEmpty()) {
-			assertTrue(httpResponse.headers().containsKey("Content-Type"));
-			assertEquals(expectedContentType, httpResponse.headers().get("Content-Type").get(0));
+			assertTrue(httpResponse.getHeaders().containsKey("Content-Type"));
+			assertEquals(expectedContentType, httpResponse.getHeaders().get("Content-Type").get(0));
 		}
-		assertTrue(httpResponse.body().length > 0);
+		assertTrue(httpResponse.getBody().length > 0);
 	}
 }
