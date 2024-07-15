@@ -17,15 +17,15 @@ import codesquad.model.UserRepositoryImpl;
 import codesquad.server.WebWorker;
 import codesquad.utils.StringConstants;
 
-public class UserHandlerTest {
+public class UserApiHandlerTest {
 
-	private static UserHandler userHandler;
+	private static UserApiHandler userApiHandler;
 	private static UserRepositoryImpl userRepositoryImpl;
 
 	@BeforeAll
 	public static void setUp() {
 		userRepositoryImpl = new UserRepositoryImpl();
-		userHandler = new UserHandler(userRepositoryImpl);
+		userApiHandler = new UserApiHandler(userRepositoryImpl);
 	}
 
 	@Test
@@ -50,7 +50,7 @@ public class UserHandlerTest {
 		WebWorker.HTTP_RESPONSE_THREAD_LOCAL.set(response);
 
 		// 핸들러 메서드 호출
-		userHandler.join();
+		userApiHandler.join();
 
 		// 응답 검증
 		assertEquals(HttpStatus.FOUND.getCode(), response.getStatus().getCode());
