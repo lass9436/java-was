@@ -32,6 +32,17 @@ public class Database {
 				statement.execute(sql.toString());
 			}
 
+			// data.sql 파일 읽기
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+				Database.class.getClassLoader().getResourceAsStream("data.sql")))) {
+				String line;
+				StringBuilder sql = new StringBuilder();
+				while ((line = reader.readLine()) != null) {
+					sql.append(line).append("\n");
+				}
+				statement.execute(sql.toString());
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
