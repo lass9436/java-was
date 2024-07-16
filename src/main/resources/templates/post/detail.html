@@ -37,10 +37,10 @@
     <div class="wrapper">
         <div class="post">
             <div class="post__account">
-                <img class="post__account__img"/>
+                <img class="post__account__img" src="/img/person.svg" style="background: white"/>
                 <p class="post__account__nickname">{{ post.username }}</p>
             </div>
-            <img class="post__img"/>
+            <img class="post__img" src="{{ post.imageUrl }}"/>
             <p class="post__article">
                 {{ post.content }}
             </p>
@@ -49,7 +49,7 @@
         {% for comment in comments %}
         <li class="comment__item">
             <div class="comment__item__user">
-                <img class="comment__item__user__img"/>
+                <img class="comment__item__user__img" src="/img/person.svg" style="background: white"/>
                 <p class="comment__item__user__nickname"> {{ comment.username }} </p>
             </div>
             <p class="comment__item__article">
