@@ -7,7 +7,7 @@ import java.util.Map;
 
 import codesquad.http.constants.HttpMethod;
 import codesquad.http.constants.HttpVersion;
-import codesquad.http.dto.HttpRequest;
+import codesquad.dto.HttpRequest;
 
 public class HttpRequestParser {
 

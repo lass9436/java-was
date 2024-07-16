@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import codesquad.http.constants.HttpVersion;
-import codesquad.http.dto.HttpResponse;
+import codesquad.dto.HttpResponse;
 import codesquad.http.status.HttpStatus;
 import codesquad.http.status.HttpStatusException;
 

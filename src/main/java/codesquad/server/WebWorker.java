@@ -10,8 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import codesquad.http.constants.HttpMethod;
-import codesquad.http.dto.HttpRequest;
-import codesquad.http.dto.HttpResponse;
+import codesquad.dto.HttpRequest;
+import codesquad.dto.HttpResponse;
 import codesquad.http.filter.FilterChain;
 import codesquad.http.mapper.HttpDynamicHandlerMapper;
 import codesquad.http.mapper.HttpErrorHandlerMapper;

@@ -12,8 +12,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import codesquad.http.constants.HttpMethod;
 import codesquad.http.constants.HttpVersion;
-import codesquad.http.dto.HttpRequest;
-import codesquad.http.dto.HttpResponse;
+import codesquad.dto.HttpRequest;
+import codesquad.dto.HttpResponse;
 import codesquad.server.WebWorker;
 
 @DisplayName("HttpStaticHandler 테스트")

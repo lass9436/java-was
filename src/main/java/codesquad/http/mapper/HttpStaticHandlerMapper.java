@@ -11,8 +11,8 @@ import java.util.Map;
 
 import codesquad.http.constants.HttpMethod;
 import codesquad.http.constants.HttpVersion;
-import codesquad.http.dto.HttpRequest;
-import codesquad.http.dto.HttpResponse;
+import codesquad.dto.HttpRequest;
+import codesquad.dto.HttpResponse;
 import codesquad.http.status.HttpStatus;
 import codesquad.http.status.HttpStatusException;
 

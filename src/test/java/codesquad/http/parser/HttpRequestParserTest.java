@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import codesquad.http.constants.HttpMethod;
 import codesquad.http.constants.HttpVersion;
-import codesquad.http.dto.HttpRequest;
+import codesquad.dto.HttpRequest;
 import codesquad.http.status.HttpStatusException;
 
 @DisplayName("HttpRequestParser 테스트")

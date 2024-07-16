@@ -9,7 +9,7 @@ import codesquad.annotation.HttpFunction;
 import codesquad.annotation.HttpHandler;
 import codesquad.http.constants.HttpHandleType;
 import codesquad.http.constants.HttpMethod;
-import codesquad.http.dto.HttpRequest;
+import codesquad.dto.HttpRequest;
 import codesquad.http.render.RenderData;
 import codesquad.model.comment.Comment;
 import codesquad.model.comment.CommentRepository;

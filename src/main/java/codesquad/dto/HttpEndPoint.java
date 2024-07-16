@@ -1,4 +1,4 @@
-package codesquad.http.dto;
+package codesquad.dto;
 
 import codesquad.http.constants.HttpMethod;
 

@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import codesquad.http.dto.FileData;
+import codesquad.dto.FileData;
 
 public class BodyParser {
 

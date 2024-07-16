@@ -1,4 +1,4 @@
-package codesquad.http.dto;
+package codesquad.dto;
 
 public class FileData {
 	private String fileName;

@@ -5,7 +5,7 @@ import static codesquad.server.WebWorker.*;
 import java.util.List;
 import java.util.Map;
 
-import codesquad.http.dto.HttpRequest;
+import codesquad.dto.HttpRequest;
 import codesquad.http.status.HttpStatus;
 import codesquad.http.status.HttpStatusException;
 import codesquad.model.user.User;
