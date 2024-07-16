@@ -15,15 +15,15 @@ public class PostRepositoryH2Impl implements PostRepository {
 
 	@Override
 	public Post create(Post post) {
-		String query = "INSERT INTO posts (username, title, content) VALUES (?, ?, ?)";
+		String query = "INSERT INTO posts (username, title, content, image_url) VALUES (?, ?, ?, ?)";
 
 		try (Connection connection = Database.getConnection();
-			 PreparedStatement statement = connection.prepareStatement(query,
-				 PreparedStatement.RETURN_GENERATED_KEYS)) {
+			 PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
 			statement.setString(1, post.getUsername());
 			statement.setString(2, post.getTitle());
 			statement.setString(3, post.getContent());
+			statement.setString(4, post.getImageUrl());
 
 			int affectedRows = statement.executeUpdate();
 
@@ -58,7 +58,8 @@ public class PostRepositoryH2Impl implements PostRepository {
 					Post post = new Post(
 						resultSet.getString("username"),
 						resultSet.getString("title"),
-						resultSet.getString("content")
+						resultSet.getString("content"),
+						resultSet.getString("image_url")
 					);
 					post.setId(resultSet.getInt("id"));
 					return post;
@@ -70,16 +71,18 @@ public class PostRepositoryH2Impl implements PostRepository {
 		return null;
 	}
 
+
 	@Override
 	public Post update(Post post) {
-		String query = "UPDATE posts SET title = ?, content = ? WHERE id = ?";
+		String query = "UPDATE posts SET title = ?, content = ?, image_url = ? WHERE id = ?";
 
 		try (Connection connection = Database.getConnection();
 			 PreparedStatement statement = connection.prepareStatement(query)) {
 
 			statement.setString(1, post.getTitle());
 			statement.setString(2, post.getContent());
-			statement.setInt(3, post.getId());
+			statement.setString(3, post.getImageUrl());
+			statement.setInt(4, post.getId());
 
 			statement.executeUpdate();
 		} catch (SQLException e) {
@@ -116,7 +119,8 @@ public class PostRepositoryH2Impl implements PostRepository {
 				Post post = new Post(
 					resultSet.getString("username"),
 					resultSet.getString("title"),
-					resultSet.getString("content")
+					resultSet.getString("content"),
+					resultSet.getString("image_url")
 				);
 				post.setId(resultSet.getInt("id"));
 				posts.add(post);
@@ -127,4 +131,5 @@ public class PostRepositoryH2Impl implements PostRepository {
 
 		return posts;
 	}
+
 }
