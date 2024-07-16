@@ -37,7 +37,7 @@
     <div class="wrapper">
         {% for post in posts %}
         <div class="post">
-            {{ post.title }}
+            <a href="/post/detail?postId={{ post.id }}"> {{ post.title }} </a>
         </div>
         {% endfor %}
         <nav class="nav">
