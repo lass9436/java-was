@@ -1,4 +1,4 @@
-package codesquad.http.handler;
+package codesquad.http.handler.user;
 
 import static codesquad.server.WebWorker.*;
 

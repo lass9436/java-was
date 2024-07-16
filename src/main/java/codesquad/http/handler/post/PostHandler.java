@@ -1,4 +1,4 @@
-package codesquad.http.handler;
+package codesquad.http.handler.post;
 
 import static codesquad.server.WebWorker.*;
 import static codesquad.session.SessionManager.*;

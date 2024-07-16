@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
+import codesquad.http.handler.user.UserApiHandler;
 import codesquad.http.parser.HttpRequestParser;
 import codesquad.http.status.HttpStatus;
 import codesquad.model.user.User;
