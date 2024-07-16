@@ -8,12 +8,13 @@ VALUES ('kimc', 'password1', '김철수', 'john@example.com'),
        ('test', 'test', '테스트', 'test@email.com');
 
 -- 포스트 테이블에 데이터 삽입
-INSERT INTO posts (username, title, content)
-VALUES ('kimc', '첫 번째 포스트', '이것은 첫 번째 포스트의 내용입니다.'),
-       ('leeyh', '두 번째 포스트', '이것은 두 번째 포스트의 내용입니다.'),
-       ('parkms', '세 번째 포스트', '이것은 세 번째 포스트의 내용입니다.'),
-       ('choijw', '네 번째 포스트', '이것은 네 번째 포스트의 내용입니다.'),
-       ('hanys', '다섯 번째 포스트', '이것은 다섯 번째 포스트의 내용입니다.');
+INSERT INTO posts (username, title, content, image_url)
+VALUES ('kimc', '첫 번째 포스트', '이것은 첫 번째 포스트의 내용입니다.', '/file/image1.jpg'),
+       ('leeyh', '두 번째 포스트', '이것은 두 번째 포스트의 내용입니다.', '/file/image2.jpg'),
+       ('parkms', '세 번째 포스트', '이것은 세 번째 포스트의 내용입니다.', '/file/image3.jpg'),
+       ('choijw', '네 번째 포스트', '이것은 네 번째 포스트의 내용입니다.', '/file/image4.jpg'),
+       ('hanys', '다섯 번째 포스트', '이것은 다섯 번째 포스트의 내용입니다.', '/file/image5.jpg');
+
 
 -- 댓글 테이블에 데이터 삽입
 INSERT INTO comments (post_id, username, content)

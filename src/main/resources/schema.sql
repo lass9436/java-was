@@ -11,7 +11,8 @@ CREATE TABLE posts (
    username VARCHAR(50) NOT NULL,
    title VARCHAR(255) NOT NULL,
    content TEXT NOT NULL,
-   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   image_url VARCHAR(255) NULL
 );
 
 CREATE TABLE comments (
