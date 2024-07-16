@@ -21,7 +21,7 @@ public class HttpRequestParser {
 
 		Map<String, List<String>> queryParams = QueryStringParser.parseQueryParams(queryString);
 		Map<String, List<String>> headers = HeaderParser.parseHeaders(inputStream);
-		Map<String, List<String>> body = BodyParser.parseRequestBody(inputStream, headers);
+		Map<String, List<Object>> body = BodyParser.parseRequestBody(inputStream, headers);
 
 		HttpMethod httpMethod = HttpMethod.valueOf(requestLineMap.get("method"));
 		HttpVersion httpVersion = HttpVersion.valueOf(

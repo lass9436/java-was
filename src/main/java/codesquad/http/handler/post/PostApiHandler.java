@@ -44,9 +44,9 @@ public class PostApiHandler {
 			return null;
 		}
 
-		Map<String, List<String>> body = httpRequest.getBody();
-		String title = body.get("title").get(0);
-		String content = body.get("content").get(0);
+		Map<String, List<Object>> body = httpRequest.getBody();
+		String title = (String)body.get("title").get(0);
+		String content = (String)body.get("content").get(0);
 
 		Post post = new Post(user.getUserId(), title, content);
 		postRepository.create(post);

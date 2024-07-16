@@ -44,9 +44,9 @@ public class CommentApiHandler {
 			return null;
 		}
 
-		Map<String, List<String>> body = httpRequest.getBody();
-		String content = body.get("content").get(0);
-		int postId = Integer.parseInt(body.get("postId").get(0));
+		Map<String, List<Object>> body = httpRequest.getBody();
+		String content = (String)body.get("content").get(0);
+		int postId = Integer.parseInt((String)body.get("postId").get(0));
 		Comment comment = new Comment(postId, user.getUserId(), content);
 		commentRepository.create(comment);
 

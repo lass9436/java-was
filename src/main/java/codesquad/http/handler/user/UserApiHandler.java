@@ -38,11 +38,11 @@ public class UserApiHandler {
 		HttpRequest httpRequest = HTTP_REQUEST_THREAD_LOCAL.get();
 		HttpResponse httpResponse = HTTP_RESPONSE_THREAD_LOCAL.get();
 
-		Map<String, List<String>> body = httpRequest.getBody();
-		String userId = body.get("userId").get(0);
-		String password = body.get("password").get(0);
-		String name = body.get("name").get(0);
-		String email = body.get("email").get(0);
+		Map<String, List<Object>> body = httpRequest.getBody();
+		String userId = (String)body.get("userId").get(0);
+		String password = (String)body.get("password").get(0);
+		String name = (String)body.get("name").get(0);
+		String email = (String)body.get("email").get(0);
 
 		final User user = new User(userId, password, name, email);
 		userRepository.create(user);
@@ -59,9 +59,9 @@ public class UserApiHandler {
 		HttpRequest httpRequest = HTTP_REQUEST_THREAD_LOCAL.get();
 		HttpResponse httpResponse = HTTP_RESPONSE_THREAD_LOCAL.get();
 
-		Map<String, List<String>> body = httpRequest.getBody();
-		String id = body.get("id").get(0);
-		String password = body.get("password").get(0);
+		Map<String, List<Object>> body = httpRequest.getBody();
+		String id = (String)body.get("id").get(0);
+		String password = (String)body.get("password").get(0);
 		try {
 			User user = userRepository.findById(id);
 			if (user.getPassword().equals(password)) {
