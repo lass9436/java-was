@@ -10,11 +10,13 @@ import org.slf4j.LoggerFactory;
 
 import codesquad.annotation.HttpFunction;
 import codesquad.annotation.HttpHandler;
+import codesquad.dto.FileData;
+import codesquad.dto.HttpRequest;
+import codesquad.dto.HttpResponse;
+import codesquad.file.FileUtil;
 import codesquad.http.constants.HttpHandleType;
 import codesquad.http.constants.HttpMethod;
 import codesquad.http.constants.HttpVersion;
-import codesquad.dto.HttpRequest;
-import codesquad.dto.HttpResponse;
 import codesquad.http.render.RenderData;
 import codesquad.http.status.HttpStatus;
 import codesquad.model.post.Post;
@@ -48,7 +50,11 @@ public class PostApiHandler {
 		String title = (String)body.get("title").get(0);
 		String content = (String)body.get("content").get(0);
 
-		Post post = new Post(user.getUserId(), title, content);
+		// 파일 업로드 처리
+		FileData fileData = (FileData)body.get("file").get(0);
+		String newFileName = FileUtil.saveFile(fileData);
+
+		Post post = new Post(user.getUserId(), title, content, newFileName);
 		postRepository.create(post);
 
 		httpResponse.setResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND,
