@@ -2,8 +2,8 @@ package codesquad.http.parser;
 
 import static codesquad.utils.StringConstants.*;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -20,8 +20,8 @@ import codesquad.session.SessionManager;
 
 public class HttpRequestParser {
 
-	public static HttpRequest parse(BufferedReader reader) throws IOException {
-		String requestLine = reader.readLine();
+	public static HttpRequest parse(InputStream inputStream) throws IOException {
+		String requestLine = readLine(inputStream);
 		Map<String, String> requestLineMap = parseRequestLine(requestLine);
 
 		String url = requestLineMap.get("url");
@@ -29,8 +29,8 @@ public class HttpRequestParser {
 		String queryString = extractQueryString(url);
 
 		Map<String, List<String>> queryParams = parseQueryParams(queryString);
-		Map<String, List<String>> headers = parseHeaders(reader);
-		Map<String, List<String>> body = parseRequestBody(reader, headers);
+		Map<String, List<String>> headers = parseHeaders(inputStream);
+		Map<String, List<String>> body = parseRequestBody(inputStream, headers);
 
 		HttpMethod httpMethod = HttpMethod.valueOf(requestLineMap.get("method"));
 		HttpVersion httpVersion = HttpVersion.valueOf(
@@ -80,11 +80,11 @@ public class HttpRequestParser {
 		return url.substring(queryIndex + 1);
 	}
 
-	private static Map<String, List<String>> parseHeaders(BufferedReader reader) throws IOException {
+	private static Map<String, List<String>> parseHeaders(InputStream inputStream) throws IOException {
 		Map<String, List<String>> headers = new HashMap<>();
 		String headerLine;
 
-		while (!(headerLine = reader.readLine()).isEmpty()) {
+		while (!(headerLine = readLine(inputStream)).isEmpty()) {
 			int index = headerLine.indexOf(":");
 			if (index == -1) {
 				throw new HttpStatusException(HttpStatus.BAD_REQUEST, "헤더 라인 형식이 잘못되었습니다.");
@@ -154,7 +154,7 @@ public class HttpRequestParser {
 		queryParams.computeIfAbsent(decodedKey, k -> new ArrayList<>()).add(decodedValue);
 	}
 
-	private static Map<String, List<String>> parseRequestBody(BufferedReader reader,
+	private static Map<String, List<String>> parseRequestBody(InputStream inputStream,
 		Map<String, List<String>> headers) throws IOException {
 		int contentLength = getContentLength(headers);
 		if (contentLength == -1) {
@@ -162,19 +162,30 @@ public class HttpRequestParser {
 		}
 
 		String contentType = headers.getOrDefault("Content-Type", List.of("")).get(0);
-		String body = readBody(reader, contentLength);
-		if (body == null) {
+		byte[] bodyBytes = readBytes(inputStream, contentLength);
+		if (bodyBytes == null) {
 			return Map.of();
 		}
 
 		if (contentType.equals("application/x-www-form-urlencoded")) {
-			return parseFormUrlEncodedBody(body);
+			return parseFormUrlEncodedBody(new String(bodyBytes));
 		}
 		if (contentType.equals("application/json")) {
-			return parseJsonBody(body);
+			return parseJsonBody(new String(bodyBytes));
 		}
 
 		return Map.of();  // 빈 JSON 객체를 반환합니다.
+	}
+
+	private static byte[] readBytes(InputStream inputStream, int length) throws IOException {
+		byte[] buffer = new byte[length];
+		int bytesRead = 0;
+		while (bytesRead < length) {
+			int result = inputStream.read(buffer, bytesRead, length - bytesRead);
+			if (result == -1) break;
+			bytesRead += result;
+		}
+		return buffer;
 	}
 
 	private static int getContentLength(Map<String, List<String>> headers) {
@@ -190,23 +201,20 @@ public class HttpRequestParser {
 		}
 	}
 
-	private static String readBody(BufferedReader reader, int contentLength) throws IOException {
-		char[] buffer = new char[1024];
-		StringBuilder body = new StringBuilder();
-		int totalRead = 0;
-		int bytesRead;
-
-		while (totalRead < contentLength
-			&& (bytesRead = reader.read(buffer, 0, Math.min(buffer.length, contentLength - totalRead))) != -1) {
-			body.append(buffer, 0, bytesRead);
-			totalRead += bytesRead;
+	private static String readLine(InputStream inputStream) throws IOException {
+		StringBuilder line = new StringBuilder();
+		int nextChar;
+		while ((nextChar = inputStream.read()) != -1) {
+			if (nextChar == '\r') {
+				nextChar = inputStream.read(); // Skip '\n'
+				break;
+			}
+			if (nextChar == '\n') {
+				break;
+			}
+			line.append((char) nextChar);
 		}
-
-		if (totalRead != contentLength) {
-			return null;  // 실제로 읽은 길이가 Content-Length와 다르면 null 반환
-		}
-
-		return body.toString();
+		return line.toString();
 	}
 
 	private static Map<String, List<String>> parseFormUrlEncodedBody(String body) throws UnsupportedEncodingException {
