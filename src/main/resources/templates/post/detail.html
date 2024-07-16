@@ -58,6 +58,25 @@
         </li>
         {% endfor %}
         </ul>
+        {% if user %}
+        <form class="form" method="post" action="/comment/write" style="width: 100%">
+            <div class="textfield" style="height: auto; padding: 15px;">
+                <p class="title_textfield">댓글</p>
+                <textarea
+                        class="input_textfield"
+                        placeholder="댓글의 내용을 입력하세요"
+                        name="content"
+                ></textarea>
+            </div>
+            <button
+                    id="registration-btn"
+                    class="btn btn_contained btn_size_m"
+                    type="submit"
+            >
+                댓글 등록
+            </button>
+        </form>
+        {% endif %}
     </div>
 </div>
 </body>
