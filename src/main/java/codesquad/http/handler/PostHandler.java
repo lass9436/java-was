@@ -3,12 +3,16 @@ package codesquad.http.handler;
 import static codesquad.server.WebWorker.*;
 import static codesquad.session.SessionManager.*;
 
+import java.util.List;
+
 import codesquad.annotation.HttpFunction;
 import codesquad.annotation.HttpHandler;
 import codesquad.http.constants.HttpHandleType;
 import codesquad.http.constants.HttpMethod;
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.render.RenderData;
+import codesquad.model.Comment;
+import codesquad.model.CommentRepository;
 import codesquad.model.Post;
 import codesquad.model.PostRepository;
 import codesquad.model.User;
@@ -17,9 +21,11 @@ import codesquad.model.User;
 public class PostHandler {
 
 	private final PostRepository postRepository;
+	private final CommentRepository commentRepository;
 
-	public PostHandler(PostRepository postRepository) {
+	public PostHandler(PostRepository postRepository, CommentRepository commentRepository) {
 		this.postRepository = postRepository;
+		this.commentRepository = commentRepository;
 	}
 
 	@HttpFunction(path = "/post/write", method = HttpMethod.GET, type = HttpHandleType.DYNAMIC)
@@ -39,6 +45,8 @@ public class PostHandler {
 		int postId = Integer.parseInt(httpRequest.getParameters().get("postId").get(0));
 		Post post = postRepository.findById(postId);
 		renderData.addAttribute("post", post);
+		List<Comment> comments = commentRepository.findByPostId(postId);
+		renderData.addAttribute("comments", comments);
 		return renderData;
 	}
 }
