@@ -2,21 +2,23 @@ package codesquad.http.handler;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.BufferedReader;
-import java.io.StringReader;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import codesquad.dto.HttpRequest;
 import codesquad.dto.HttpResponse;
 import codesquad.http.handler.user.UserApiHandler;
-import codesquad.http.parser.HttpRequestParser;
 import codesquad.http.status.HttpStatus;
 import codesquad.model.user.User;
 import codesquad.model.user.UserRepositoryImpl;
 import codesquad.server.WebWorker;
 import codesquad.utils.StringConstants;
+import codesquad.http.constants.HttpMethod;
+import codesquad.http.constants.HttpVersion;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class UserApiHandlerTest {
 
@@ -31,19 +33,24 @@ public class UserApiHandlerTest {
 
 	@Test
 	public void 사용자_생성_성공() throws Exception {
+		// JSON Body 설정
 		String jsonBody = "{ \"userId\": \"john_doe\", \"password\": \"password123\", \"name\": \"John Doe\", \"email\": \"john@example.com\" }";
 		byte[] jsonBodyBytes = jsonBody.getBytes(StringConstants.UTF8);
-		String httpRequestString =
-			"POST /create HTTP/1.1\r\n" +
-				"Host: localhost:8080\r\n" +
-				"Connection: keep-alive\r\n" +
-				"Content-Type: application/json\r\n" +
-				"Content-Length: " + jsonBodyBytes.length + "\r\n" +
-				"\r\n" +
-				jsonBody;
 
-		BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
-		HttpRequest request = HttpRequestParser.parse(reader);
+		// HttpRequest 설정
+		Map<String, List<String>> headers = new HashMap<>();
+		headers.put("Host", List.of("localhost:8080"));
+		headers.put("Connection", List.of("keep-alive"));
+		headers.put("Content-Type", List.of("application/json"));
+		headers.put("Content-Length", List.of(String.valueOf(jsonBodyBytes.length)));
+
+		Map<String, List<Object>> body = new HashMap<>();
+		body.put("userId", List.of((Object) "john_doe"));
+		body.put("password", List.of((Object) "password123"));
+		body.put("name", List.of((Object) "John Doe"));
+		body.put("email", List.of((Object) "john@example.com"));
+
+		HttpRequest request = new HttpRequest(HttpMethod.POST, "/create", HttpVersion.HTTP_1_1, headers, new HashMap<>(), body);
 
 		// 스레드 로컬에 요청과 응답 설정
 		WebWorker.HTTP_REQUEST_THREAD_LOCAL.set(request);
