@@ -40,6 +40,7 @@ public class Post {
 	@Override
 	public String toString() {
 		return "{" +
+			"\"id\": \"" + id + "\"," +
 			"\"userId\": \"" + username + "\"," +
 			"\"title\": \"" + title + "\"," +
 			"\"content\": \"" + content + "\"," +
