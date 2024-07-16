@@ -34,7 +34,7 @@
         </ul>
     </header>
     <div class="page">
-        <form class="form" method="post" action="/post/write">
+        <form class="form" method="post" action="/post/write" enctype="multipart/form-data">
             <h2 class="page-title">게시글 작성</h2>
             <div class="textfield textfield_size_s" style="width: auto;">
                 <p class="title_textfield">제목</p>
@@ -53,6 +53,14 @@
                         name="content"
                         autocomplete="username"
                 ></textarea>
+            </div>
+            <div class="textfield textfield_size_m" style="height: auto">
+                <p class="title_textfield">이미지 업로드</p>
+                <input
+                        class="input_textfield"
+                        type="file"
+                        name="file"
+                />
             </div>
             <button
                     id="registration-btn"
