@@ -14,7 +14,7 @@ public class HttpRequest {
 	private HttpVersion version;
 	private Map<String, List<String>> headers;
 	private Map<String, List<String>> parameters;
-	private Map<String, List<String>> body;
+	private Map<String, List<Object>> body;
 
 	public HttpRequest() {
 		method = HttpMethod.GET;
@@ -27,7 +27,7 @@ public class HttpRequest {
 
 	public HttpRequest(HttpMethod method, String path, HttpVersion version,
 		Map<String, List<String>> headers, Map<String, List<String>> parameters,
-		Map<String, List<String>> body) {
+		Map<String, List<Object>> body) {
 		this.method = method;
 		this.path = path;
 		this.version = version;
@@ -57,7 +57,7 @@ public class HttpRequest {
 		return parameters;
 	}
 
-	public Map<String, List<String>> getBody() {
+	public Map<String, List<Object>> getBody() {
 		return body;
 	}
 
@@ -82,7 +82,7 @@ public class HttpRequest {
 		this.parameters = parameters;
 	}
 
-	public void setBody(Map<String, List<String>> body) {
+	public void setBody(Map<String, List<Object>> body) {
 		this.body = body;
 	}
 
@@ -94,7 +94,6 @@ public class HttpRequest {
 			", version='" + version.getVersion() + '\'' +
 			", headers=" + mapToString(headers) +
 			", parameters=" + mapToString(parameters) +
-			", body=" + mapToString(body) +
 			'}';
 	}
 
