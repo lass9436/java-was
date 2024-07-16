@@ -32,7 +32,7 @@ public class PostApiHandler {
 		this.postRepository = postRepository;
 	}
 
-	@HttpFunction(path = "/user/write", method = HttpMethod.POST, type = HttpHandleType.DYNAMIC)
+	@HttpFunction(path = "/post/write", method = HttpMethod.POST, type = HttpHandleType.DYNAMIC)
 	public RenderData createPost() {
 		HttpRequest httpRequest = HTTP_REQUEST_THREAD_LOCAL.get();
 		HttpResponse httpResponse = HTTP_RESPONSE_THREAD_LOCAL.get();

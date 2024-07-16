@@ -70,9 +70,4 @@ public class UserHandler {
 		return renderData;
 	}
 
-	@HttpFunction(path = "/user/write", method = HttpMethod.GET, type = HttpHandleType.DYNAMIC)
-	public RenderData handleUserWrite() {
-		RenderData renderData = new RenderData("/user/write");
-		return renderData;
-	}
 }
