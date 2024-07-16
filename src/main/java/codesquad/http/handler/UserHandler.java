@@ -1,96 +1,78 @@
 package codesquad.http.handler;
 
+import static codesquad.session.SessionManager.*;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import codesquad.http.annotation.HttpFunction;
-import codesquad.http.annotation.HttpHandler;
+import codesquad.annotation.HttpFunction;
+import codesquad.annotation.HttpHandler;
 import codesquad.http.constants.HttpHandleType;
 import codesquad.http.constants.HttpMethod;
-import codesquad.http.constants.HttpVersion;
-import codesquad.http.dto.HttpRequest;
-import codesquad.http.dto.HttpResponse;
-import codesquad.http.status.HttpStatus;
+import codesquad.http.render.RenderData;
+import codesquad.model.Post;
+import codesquad.model.PostRepository;
 import codesquad.model.User;
 import codesquad.model.UserRepository;
-import codesquad.session.Session;
-import codesquad.session.SessionManager;
 
 @HttpHandler
 public class UserHandler {
 
 	private final Logger logger = LoggerFactory.getLogger(UserHandler.class);
 
-	private final UserRepository userRepository = new UserRepository();
+	private final UserRepository userRepository;
+	private final PostRepository postRepository;
 
-	@HttpFunction(path = "/create", method = HttpMethod.POST, type = HttpHandleType.DYNAMIC)
-	public HttpResponse join(HttpRequest httpRequest) {
-		Map<String, List<String>> body = httpRequest.body();
-		String userId = body.get("userId").get(0);
-		String password = body.get("password").get(0);
-		String name = body.get("name").get(0);
-		String email = body.get("email").get(0);
-
-		final User user = new User(userId, password, name, email);
-		userRepository.create(user);
-
-		logger.info("Creating user: {}", user);
-		Map<String, List<String>> headers = Map.of("Location", List.of("/index.html"));
-		return new HttpResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND, headers, new byte[0]);
+	public UserHandler(UserRepository userRepository, PostRepository postRepository) {
+		this.userRepository = userRepository;
+		this.postRepository = postRepository;
 	}
 
-	@HttpFunction(path = "/login", method = HttpMethod.POST, type = HttpHandleType.DYNAMIC)
-	public HttpResponse login(HttpRequest httpRequest) {
-		Map<String, List<String>> body = httpRequest.body();
-		String id = body.get("id").get(0);
-		String password = body.get("password").get(0);
-		try {
-			User user = userRepository.findById(id);
-			if (user.password().equals(password)) {
-				String sessionId = SessionManager.putSession("user", user);
-				Map<String, List<String>> headers = Map.of(
-					"Location", List.of("/index.html"),
-					"Set-Cookie", List.of("SID=" + sessionId + "; Path=/")
-				);
-				return new HttpResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND, headers, new byte[0]);
-			}
-			Map<String, List<String>> headers = Map.of("Location", List.of("/login"));
-			return new HttpResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND, headers, new byte[0]);
-		} catch (Exception e) {
-			Map<String, List<String>> headers = Map.of("Location", List.of("/login"));
-			return new HttpResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND, headers, new byte[0]);
-		}
+	@HttpFunction(path = "/", method = HttpMethod.GET, type = HttpHandleType.DYNAMIC)
+	public RenderData handleIndex() {
+		// 세션에서 User 인스턴스 획득
+		User user = (User)getSession("user");
+		Map<String, Object> model = new HashMap<>();
+		model.put("user", user);
+
+		// 글 목록 획득
+		List<Post> posts = postRepository.findAll();
+		model.put("posts", posts);
+
+		// RenderData 객체를 생성하여 뷰 이름과 모델을 설정합니다.
+		RenderData renderData = new RenderData("/index");
+		renderData.getModel().putAll(model);
+
+		return renderData;
 	}
 
-	@HttpFunction(path = "/isLogin", method = HttpMethod.GET, type = HttpHandleType.DYNAMIC)
-	public HttpResponse isLogin(HttpRequest httpRequest) {
-		User user = (User) SessionManager.getSession("user");
-		if (user != null) {
-			return new HttpResponse(HttpVersion.HTTP_1_1, HttpStatus.OK, Map.of(), user.toString().getBytes());
-		}
-		return new HttpResponse(HttpVersion.HTTP_1_1, HttpStatus.UNAUTHORIZED, Map.of(), new byte[0]);
+	@HttpFunction(path = "/user/list", method = HttpMethod.GET, type = HttpHandleType.DYNAMIC)
+	public RenderData handleUserList() {
+		// 자기 자신 조회
+		User user = (User)getSession("user");
+
+		// 전체 유저 목록 조회
+		List<User> users = userRepository.findAll();
+
+		// 모델
+		Map<String, Object> model = new HashMap<>();
+		model.put("users", users);
+		model.put("user", user);
+
+		// 렌더 데이터
+		RenderData renderData = new RenderData("/user/list");
+		renderData.getModel().putAll(model);
+
+		return renderData;
 	}
 
-	@HttpFunction(path = "/users", method = HttpMethod.GET, type = HttpHandleType.DYNAMIC)
-	public HttpResponse getUsers(HttpRequest httpRequest) {
-		List<User> list = userRepository.findAll();
-		String body = list.stream()
-			.map(User::toString)
-			.collect(Collectors.joining(",", "[", "]"));
-		return new HttpResponse(HttpVersion.HTTP_1_1, HttpStatus.OK, Map.of(), body.getBytes());
-	}
-
-	@HttpFunction(path = "/logout", method = HttpMethod.POST, type = HttpHandleType.DYNAMIC)
-	public HttpResponse logout(HttpRequest httpRequest) {
-		SessionManager.removeSession();
-		Map<String, List<String>> headers = Map.of(
-			"Set-Cookie", List.of("SID=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/"),
-			"Location", List.of("/") // 리다이렉트 헤더 추가
-		);
-		return new HttpResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND, headers, new byte[0]);
+	@HttpFunction(path = "/user/write", method = HttpMethod.GET, type = HttpHandleType.DYNAMIC)
+	public RenderData handleUserWrite() {
+		RenderData renderData = new RenderData("/user/write");
+		return renderData;
 	}
 }

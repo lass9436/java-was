@@ -1,5 +1,7 @@
 package codesquad.http.mapper;
 
+import static codesquad.server.WebWorker.*;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,12 +40,13 @@ public class HttpStaticHandlerMapper {
 		"/user/list", "/user/list/index.html"
 	);
 
-	public HttpResponse handle(HttpRequest httpRequest) {
-		String path = httpRequest.path();
+	public HttpResponse handle() {
+		HttpRequest httpRequest = HTTP_REQUEST_THREAD_LOCAL.get();
+		String path = httpRequest.getPath();
 		path = urlMapping.getOrDefault(path, path);
 		String resourcePath = STATIC_ROOT_PATH + path;
 
-		if (HttpMethod.GET != httpRequest.method()) {
+		if (HttpMethod.GET != httpRequest.getMethod()) {
 			throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Invalid HTTP method");
 		}
 
@@ -53,7 +56,7 @@ public class HttpStaticHandlerMapper {
 			}
 
 			byte[] body = readAllBytes(inputStream);
-			HttpVersion version = httpRequest.version();
+			HttpVersion version = httpRequest.getVersion();
 			String extension = resourcePath.substring(resourcePath.lastIndexOf(".") + 1);
 			String mimeType = MIME_TYPES.getOrDefault(extension, "application/octet-stream");
 

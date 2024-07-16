@@ -1,49 +1,19 @@
 package codesquad.model;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
-import codesquad.http.status.HttpStatus;
-import codesquad.http.status.HttpStatusException;
+import codesquad.annotation.Repository;
 
-public class UserRepository {
+@Repository
+public interface UserRepository {
 
-	private static final ConcurrentMap<String, User> users = new ConcurrentHashMap<>();
+	User create(User user);
 
-	public User create(User user) {
-		if(users.containsKey(user.userId())){
-			throw new IllegalArgumentException("User with id " + user.userId() + " already exists");
-		}
-		users.put(user.userId(), user);
-		return user;
-	}
+	User findById(String userId);
 
-	public User findById(String userId) {
-		if(!users.containsKey(userId)){
-			throw new IllegalArgumentException("User with id " + userId + " does not exist");
-		}
-		return users.get(userId);
-	}
+	User update(User user);
 
-	public User update(User user) {
-		if(!users.containsKey(user.userId())){
-			throw new IllegalArgumentException("User with id " + user.userId() + " does not exist");
-		}
-		users.put(user.userId(), user);
-		return user;
-	}
+	void delete(String userId);
 
-	public void delete(String userId) {
-		if(!users.containsKey(userId)){
-			throw new IllegalArgumentException("User with id " + userId + " does not exist");
-		}
-		users.remove(userId);
-	}
-
-	public List<User> findAll() {
-		return new ArrayList<>(users.values());
-	}
-
+	List<User> findAll();
 }

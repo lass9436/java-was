@@ -1,4 +1,4 @@
-package codesquad.http.annotation;
+package codesquad.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,6 +12,8 @@ import codesquad.http.constants.HttpMethod;
 @Target(ElementType.METHOD)
 public @interface HttpFunction {
 	String path();
+
 	HttpMethod method();
+
 	HttpHandleType type();
 }

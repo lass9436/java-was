@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="/reset.css" rel="stylesheet"/>
+    <link href="/global.css" rel="stylesheet"/>
+    <link href="/main.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <a href="/"><img src="/img/signiture.svg"/></a>
+        <ul class="header__menu">
+            {% if user %}
+            <li class="header__menu__item">
+                <a class="btn btn_contained btn_size_s" href="/user/list">{{ user.name }}</a>
+            </li>
+            <li class="header__menu__item" id="logout">
+                <form id="logoutForm" action="/logout" method="POST">
+                    <button type="submit" class="btn btn_ghost btn_size_s">로그 아웃</button>
+                </form>
+            </li>
+            {% endif %}
+            {% if !user %}
+            <li class="header__menu__item">
+                <a class="btn btn_contained btn_size_s" href="/login">로그인</a>
+            </li>
+            <li class="header__menu__item">
+                <a class="btn btn_ghost btn_size_s" href="/registration">
+                    회원 가입
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </header>
+    <div class="wrapper">
+        <!--유저 정보 페이지-->
+        <ul class="user-list" id="user-list">
+            <!-- 유저 목록이 여기에 동적으로 추가될 것입니다 -->
+            {% for user in users %}
+            <li>{{ user.name }} {{ user.email }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+</body>
+</html>
