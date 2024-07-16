@@ -6,11 +6,20 @@ public class Post {
 	private String title;
 	private String content;
 	private String createdAt;
+	private String imageUrl; // 이미지 링크를 저장할 필드 추가
 
 	public Post(String username, String title, String content) {
 		this.username = username;
 		this.title = title;
 		this.content = content;
+	}
+
+	// 새로운 생성자 추가 - 이미지 URL을 포함
+	public Post(String username, String title, String content, String imageUrl) {
+		this.username = username;
+		this.title = title;
+		this.content = content;
+		this.imageUrl = imageUrl;
 	}
 
 	public int getId() {
@@ -37,6 +46,14 @@ public class Post {
 		return createdAt;
 	}
 
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
 	@Override
 	public String toString() {
 		return "{" +
@@ -44,7 +61,8 @@ public class Post {
 			"\"userId\": \"" + username + "\"," +
 			"\"title\": \"" + title + "\"," +
 			"\"content\": \"" + content + "\"," +
-			"\"createdAt\": \"" + createdAt + "\"" +
+			"\"createdAt\": \"" + createdAt + "\"," +
+			"\"imageUrl\": \"" + imageUrl + "\"" +
 			'}';
 	}
 }
