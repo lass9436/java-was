@@ -1,4 +1,4 @@
-package codesquad.model;
+package codesquad.model.comment;
 
 public class Comment {
 	private int id;

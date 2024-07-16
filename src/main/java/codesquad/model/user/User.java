@@ -1,4 +1,4 @@
-package codesquad.model;
+package codesquad.model.user;
 
 public class User {
 	private String userId;

@@ -11,11 +11,11 @@ import codesquad.http.constants.HttpHandleType;
 import codesquad.http.constants.HttpMethod;
 import codesquad.http.dto.HttpRequest;
 import codesquad.http.render.RenderData;
-import codesquad.model.Comment;
-import codesquad.model.CommentRepository;
-import codesquad.model.Post;
-import codesquad.model.PostRepository;
-import codesquad.model.User;
+import codesquad.model.comment.Comment;
+import codesquad.model.comment.CommentRepository;
+import codesquad.model.post.Post;
+import codesquad.model.post.PostRepository;
+import codesquad.model.user.User;
 
 @HttpHandler
 public class PostHandler {

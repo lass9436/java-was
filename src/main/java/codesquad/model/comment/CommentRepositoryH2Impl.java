@@ -1,4 +1,4 @@
-package codesquad.model;
+package codesquad.model.comment;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

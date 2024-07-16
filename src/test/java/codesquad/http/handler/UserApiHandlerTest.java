@@ -12,8 +12,8 @@ import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
 import codesquad.http.parser.HttpRequestParser;
 import codesquad.http.status.HttpStatus;
-import codesquad.model.User;
-import codesquad.model.UserRepositoryImpl;
+import codesquad.model.user.User;
+import codesquad.model.user.UserRepositoryImpl;
 import codesquad.server.WebWorker;
 import codesquad.utils.StringConstants;
 

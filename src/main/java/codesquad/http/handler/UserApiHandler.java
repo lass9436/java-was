@@ -18,8 +18,8 @@ import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
 import codesquad.http.render.RenderData;
 import codesquad.http.status.HttpStatus;
-import codesquad.model.User;
-import codesquad.model.UserRepository;
+import codesquad.model.user.User;
+import codesquad.model.user.UserRepository;
 import codesquad.session.SessionManager;
 
 @HttpHandler

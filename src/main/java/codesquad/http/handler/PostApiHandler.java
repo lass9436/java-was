@@ -17,9 +17,9 @@ import codesquad.http.dto.HttpRequest;
 import codesquad.http.dto.HttpResponse;
 import codesquad.http.render.RenderData;
 import codesquad.http.status.HttpStatus;
-import codesquad.model.Post;
-import codesquad.model.PostRepository;
-import codesquad.model.User;
+import codesquad.model.post.Post;
+import codesquad.model.post.PostRepository;
+import codesquad.model.user.User;
 import codesquad.session.SessionManager;
 
 @HttpHandler
