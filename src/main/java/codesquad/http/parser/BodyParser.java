@@ -31,7 +31,7 @@ public class BodyParser {
 		if (contentType.equals("application/json")) {
 			return parseJsonBody(new String(bodyBytes));
 		}
-		if (contentType.equals("multipart/form-data")) {
+		if (contentType.startsWith("multipart/form-data")) {
 			String boundary = getBoundary(contentType);
 			if (boundary == null) {
 				throw new IOException("Multipart boundary not found in Content-Type header");
@@ -110,13 +110,16 @@ public class BodyParser {
 
 		while (true) {
 			int boundaryPos = indexOf(bodyBytes, delimiter.getBytes(), startPos);
-			if (boundaryPos == -1) break;
+			if (boundaryPos == -1)
+				break;
 
 			int nextPos = indexOf(bodyBytes, "\r\n\r\n".getBytes(), boundaryPos);
-			if (nextPos == -1) break;
+			if (nextPos == -1)
+				break;
 
 			int partEndPos = indexOf(bodyBytes, delimiter.getBytes(), nextPos + 4);
-			if (partEndPos == -1) break;
+			if (partEndPos == -1)
+				break;
 
 			byte[] partHeadersBytes = Arrays.copyOfRange(bodyBytes, boundaryPos + delimiter.length(), nextPos);
 			String partHeaders = new String(partHeadersBytes).trim();
@@ -159,7 +162,8 @@ public class BodyParser {
 	}
 
 	private static int indexOf(byte[] array, byte[] target, int start) {
-		outer: for (int i = start; i <= array.length - target.length; i++) {
+		outer:
+		for (int i = start; i <= array.length - target.length; i++) {
 			for (int j = 0; j < target.length; j++) {
 				if (array[i + j] != target[j]) {
 					continue outer;
