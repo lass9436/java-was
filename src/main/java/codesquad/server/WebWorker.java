@@ -1,8 +1,7 @@
 package codesquad.server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.function.Function;
@@ -11,8 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import codesquad.http.constants.HttpMethod;
-import codesquad.http.dto.HttpRequest;
-import codesquad.http.dto.HttpResponse;
+import codesquad.dto.HttpRequest;
+import codesquad.dto.HttpResponse;
 import codesquad.http.filter.FilterChain;
 import codesquad.http.mapper.HttpDynamicHandlerMapper;
 import codesquad.http.mapper.HttpErrorHandlerMapper;
@@ -51,14 +50,14 @@ public class WebWorker {
 
 	public void process(Socket socket) {
 		try (OutputStream clientOutput = socket.getOutputStream();
-			 BufferedReader clientInputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+			 InputStream clientInput = socket.getInputStream()) {
 			// 클라이언트 연결 로그 출력
 			//logger.info("Client connected");
 			HTTP_REQUEST_THREAD_LOCAL.set(new HttpRequest());
 			HTTP_RESPONSE_THREAD_LOCAL.set(new HttpResponse());
 			try {
 				// HTTP Request Parse
-				HTTP_REQUEST_THREAD_LOCAL.set(HttpRequestParser.parse(clientInputReader));
+				HTTP_REQUEST_THREAD_LOCAL.set(HttpRequestParser.parse(clientInput));
 				HttpRequest httpRequest = HTTP_REQUEST_THREAD_LOCAL.get();
 				logger.info("{} {}", httpRequest.getMethod(), httpRequest.getPath());
 

@@ -8,6 +8,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import codesquad.model.user.User;
+import codesquad.model.user.UserRepositoryImpl;
+
 class UserRepositoryImplTest {
 
 	private static UserRepositoryImpl userRepositoryImpl;

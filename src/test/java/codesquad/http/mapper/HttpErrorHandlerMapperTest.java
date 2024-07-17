@@ -6,7 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import codesquad.http.constants.HttpVersion;
-import codesquad.http.dto.HttpResponse;
+import codesquad.dto.HttpResponse;
 import codesquad.http.status.HttpStatus;
 import codesquad.http.status.HttpStatusException;
 

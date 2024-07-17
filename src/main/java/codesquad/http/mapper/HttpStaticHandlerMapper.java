@@ -9,10 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import codesquad.dto.FileData;
+import codesquad.dto.HttpRequest;
+import codesquad.dto.HttpResponse;
+import codesquad.file.FileUtil;
 import codesquad.http.constants.HttpMethod;
 import codesquad.http.constants.HttpVersion;
-import codesquad.http.dto.HttpRequest;
-import codesquad.http.dto.HttpResponse;
 import codesquad.http.status.HttpStatus;
 import codesquad.http.status.HttpStatusException;
 
@@ -45,6 +47,21 @@ public class HttpStaticHandlerMapper {
 		String path = httpRequest.getPath();
 		path = urlMapping.getOrDefault(path, path);
 		String resourcePath = STATIC_ROOT_PATH + path;
+
+		if (path.startsWith("/file/") && HttpMethod.GET == httpRequest.getMethod()) {
+			path = path.substring(6);
+			FileData fileData = FileUtil.getFile(path);
+			if (fileData == null) {
+				throw new HttpStatusException(HttpStatus.NOT_FOUND, "File not found");
+			}
+			HttpVersion version = httpRequest.getVersion();
+			Map<String, List<String>> headers = new HashMap<>();
+			String extension = fileData.getContentType();
+			String mimeType = MIME_TYPES.getOrDefault(extension, "application/octet-stream");
+			headers.put("Content-Type", List.of(mimeType));
+			headers.put("Content-Length", List.of(String.valueOf(fileData.getData().length)));
+			return new HttpResponse(version, HttpStatus.OK, headers, fileData.getData());
+		}
 
 		if (HttpMethod.GET != httpRequest.getMethod()) {
 			throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Invalid HTTP method");

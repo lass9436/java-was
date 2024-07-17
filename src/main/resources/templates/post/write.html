@@ -9,20 +9,32 @@
 <body>
 <div class="container">
     <header class="header">
-        <a href="/main"><img src="/img/signiture.svg"/></a>
+        <a href="/"><img src="/img/signiture.svg"/></a>
         <ul class="header__menu">
+            {% if user %}
             <li class="header__menu__item">
-                <a class="btn btn_contained btn_size_s" href="/article">글쓰기</a>
+                <a class="btn btn_contained btn_size_s" href="/user/list">{{ user.name }}</a>
+            </li>
+            <li class="header__menu__item" id="logout">
+                <form id="logoutForm" action="/logout" method="POST">
+                    <button type="submit" class="btn btn_ghost btn_size_s">로그 아웃</button>
+                </form>
+            </li>
+            {% endif %}
+            {% if !user %}
+            <li class="header__menu__item">
+                <a class="btn btn_contained btn_size_s" href="/login">로그인</a>
             </li>
             <li class="header__menu__item">
-                <button id="logout-btn" class="btn btn_ghost btn_size_s">
-                    로그아웃
-                </button>
+                <a class="btn btn_ghost btn_size_s" href="/registration">
+                    회원 가입
+                </a>
             </li>
+            {% endif %}
         </ul>
     </header>
     <div class="page">
-        <form class="form" method="post" action="/user/write">
+        <form class="form" method="post" action="/post/write" enctype="multipart/form-data">
             <h2 class="page-title">게시글 작성</h2>
             <div class="textfield textfield_size_s" style="width: auto;">
                 <p class="title_textfield">제목</p>
@@ -41,6 +53,14 @@
                         name="content"
                         autocomplete="username"
                 ></textarea>
+            </div>
+            <div class="textfield textfield_size_m" style="height: auto">
+                <p class="title_textfield">이미지 업로드</p>
+                <input
+                        class="input_textfield"
+                        type="file"
+                        name="file"
+                />
             </div>
             <button
                     id="registration-btn"

@@ -1,4 +1,4 @@
-package codesquad.http.handler;
+package codesquad.http.handler.user;
 
 import static codesquad.session.SessionManager.*;
 
@@ -14,10 +14,10 @@ import codesquad.annotation.HttpHandler;
 import codesquad.http.constants.HttpHandleType;
 import codesquad.http.constants.HttpMethod;
 import codesquad.http.render.RenderData;
-import codesquad.model.Post;
-import codesquad.model.PostRepository;
-import codesquad.model.User;
-import codesquad.model.UserRepository;
+import codesquad.model.post.Post;
+import codesquad.model.post.PostRepository;
+import codesquad.model.user.User;
+import codesquad.model.user.UserRepository;
 
 @HttpHandler
 public class UserHandler {
@@ -70,9 +70,4 @@ public class UserHandler {
 		return renderData;
 	}
 
-	@HttpFunction(path = "/user/write", method = HttpMethod.GET, type = HttpHandleType.DYNAMIC)
-	public RenderData handleUserWrite() {
-		RenderData renderData = new RenderData("/user/write");
-		return renderData;
-	}
 }

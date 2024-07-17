@@ -14,7 +14,7 @@ import codesquad.annotation.HttpHandler;
 import codesquad.container.ComponentScanner;
 import codesquad.container.DependencyFactory;
 import codesquad.http.constants.HttpHandleType;
-import codesquad.http.dto.HttpEndPoint;
+import codesquad.dto.HttpEndPoint;
 import codesquad.http.render.RenderData;
 
 public class HttpHandlerRegistry {

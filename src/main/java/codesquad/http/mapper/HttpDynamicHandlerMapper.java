@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.function.Function;
 
 import codesquad.http.constants.HttpHandleType;
-import codesquad.http.dto.HttpEndPoint;
-import codesquad.http.dto.HttpRequest;
+import codesquad.dto.HttpEndPoint;
+import codesquad.dto.HttpRequest;
 import codesquad.http.registry.HttpHandlerRegistry;
 import codesquad.http.render.RenderData;
 

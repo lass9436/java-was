@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link href="./reset.css" rel="stylesheet"/>
-    <link href="./global.css" rel="stylesheet"/>
-    <link href="./main.css" rel="stylesheet"/>
+    <link href="/reset.css" rel="stylesheet"/>
+    <link href="/global.css" rel="stylesheet"/>
+    <link href="/main.css" rel="stylesheet"/>
 </head>
 <body>
 <div class="container">
@@ -37,7 +37,7 @@
     <div class="wrapper">
         {% for post in posts %}
         <div class="post">
-            {{ post.title }}
+            <a href="/post/detail?postId={{ post.id }}"> {{ post.title }} </a>
         </div>
         {% endfor %}
         <nav class="nav">
@@ -52,10 +52,7 @@
                     </a>
                 </li>
                 <li class="nav__menu__item">
-                    <a class="btn btn_ghost btn_size_m" href="/user/write">글쓰기</a>
-                </li>
-                <li class="nav__menu__item">
-                    <a class="btn btn_ghost btn_size_m">댓글 작성</a>
+                    <a class="btn btn_ghost btn_size_m" href="/post/write">글쓰기</a>
                 </li>
                 <li class="nav__menu__item">
                     <a class="nav__menu__item__btn" href="">

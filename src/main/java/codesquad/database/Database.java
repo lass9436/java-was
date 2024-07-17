@@ -20,31 +20,25 @@ public class Database {
 	public static void initializeDatabase() {
 		try (Connection connection = getConnection();
 			 Statement statement = connection.createStatement()) {
-
-			// schema.sql 파일 읽기
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-				Database.class.getClassLoader().getResourceAsStream("schema.sql")))) {
-				String line;
-				StringBuilder sql = new StringBuilder();
-				while ((line = reader.readLine()) != null) {
-					sql.append(line).append("\n");
-				}
-				statement.execute(sql.toString());
-			}
-
-			// data.sql 파일 읽기
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-				Database.class.getClassLoader().getResourceAsStream("data.sql")))) {
-				String line;
-				StringBuilder sql = new StringBuilder();
-				while ((line = reader.readLine()) != null) {
-					sql.append(line).append("\n");
-				}
-				statement.execute(sql.toString());
-			}
-
+			executeSqlFile(statement, "schema.sql");
+			executeSqlFile(statement, "data.sql");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+
+	private static void executeSqlFile(Statement statement, String fileName) {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+			Database.class.getClassLoader().getResourceAsStream(fileName)))) {
+			String line;
+			StringBuilder sql = new StringBuilder();
+			while ((line = reader.readLine()) != null) {
+				sql.append(line).append("\n");
+			}
+			statement.execute(sql.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 }

@@ -1,8 +1,9 @@
 CREATE TABLE users (
-   username VARCHAR(50) NOT NULL,
+   username VARCHAR(50) NOT NULL UNIQUE,
    password VARCHAR(255) NOT NULL,
    name VARCHAR(100) NOT NULL,
-   email VARCHAR(100) NOT NULL
+   email VARCHAR(100) NOT NULL,
+   CONSTRAINT UC_Username UNIQUE (username)
 );
 
 CREATE TABLE posts (
@@ -10,5 +11,16 @@ CREATE TABLE posts (
    username VARCHAR(50) NOT NULL,
    title VARCHAR(255) NOT NULL,
    content TEXT NOT NULL,
-   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   image_url VARCHAR(255) NULL
+);
+
+CREATE TABLE comments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  post_id INT NOT NULL,
+  username VARCHAR(50) NOT NULL,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (post_id) REFERENCES posts(id),
+  FOREIGN KEY (username) REFERENCES users(username)
 );

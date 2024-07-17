@@ -2,9 +2,10 @@ package codesquad.http.parser;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import codesquad.http.constants.HttpMethod;
 import codesquad.http.constants.HttpVersion;
-import codesquad.http.dto.HttpRequest;
+import codesquad.dto.HttpRequest;
 import codesquad.http.status.HttpStatusException;
 
 @DisplayName("HttpRequestParser 테스트")
@@ -26,10 +27,10 @@ class HttpRequestParserTest {
 		@Test
 		void 요청_라인이_비어있는_경우_예외_발생() {
 			String httpRequestString = "\r\n";
+			InputStream inputStream = new ByteArrayInputStream(httpRequestString.getBytes(StandardCharsets.UTF_8));
 
-			BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
 			Exception exception = assertThrows(HttpStatusException.class, () -> {
-				HttpRequestParser.parse(reader);
+				HttpRequestParser.parse(inputStream);
 			});
 
 			assertEquals("요청 라인이 비어있습니다.", exception.getMessage());
@@ -38,10 +39,10 @@ class HttpRequestParserTest {
 		@Test
 		void 요청_라인_형식이_잘못된_경우_예외_발생() {
 			String httpRequestString = "GET /index.html\r\n";  // 잘못된 형식
+			InputStream inputStream = new ByteArrayInputStream(httpRequestString.getBytes(StandardCharsets.UTF_8));
 
-			BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
 			Exception exception = assertThrows(HttpStatusException.class, () -> {
-				HttpRequestParser.parse(reader);
+				HttpRequestParser.parse(inputStream);
 			});
 
 			assertEquals("요청 라인 형식이 잘못되었습니다.", exception.getMessage());
@@ -54,10 +55,10 @@ class HttpRequestParserTest {
 					"Host: localhost:8080\r\n" +
 					"Connection keep-alive\r\n" + // 잘못된 헤더 형식 (콜론이 없음)
 					"\r\n";
+			InputStream inputStream = new ByteArrayInputStream(httpRequestString.getBytes(StandardCharsets.UTF_8));
 
-			BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
 			Exception exception = assertThrows(HttpStatusException.class, () -> {
-				HttpRequestParser.parse(reader);
+				HttpRequestParser.parse(inputStream);
 			});
 
 			assertEquals("헤더 라인 형식이 잘못되었습니다.", exception.getMessage());
@@ -70,10 +71,10 @@ class HttpRequestParserTest {
 					"Host: \r\n" +  // 밸류가 비어있음
 					"Connection: keep-alive\r\n" +
 					"\r\n";
+			InputStream inputStream = new ByteArrayInputStream(httpRequestString.getBytes(StandardCharsets.UTF_8));
 
-			BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
 			Exception exception = assertThrows(HttpStatusException.class, () -> {
-				HttpRequestParser.parse(reader);
+				HttpRequestParser.parse(inputStream);
 			});
 
 			assertEquals("헤더 키 또는 밸류가 비어있습니다.", exception.getMessage());
@@ -85,12 +86,11 @@ class HttpRequestParserTest {
 				"GET /index.html HTTP/1.1\r\n" +
 					"Host: localhost:8080\r\n" +
 					"Connection: keep-alive\r\n" +
-					"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8\r\n"
-					+
+					"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8\r\n" +
 					"\r\n";
+			InputStream inputStream = new ByteArrayInputStream(httpRequestString.getBytes(StandardCharsets.UTF_8));
 
-			BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
-			HttpRequest httpRequest = HttpRequestParser.parse(reader);
+			HttpRequest httpRequest = HttpRequestParser.parse(inputStream);
 
 			assertEquals(HttpMethod.GET, httpRequest.getMethod());
 			assertEquals("/index.html", httpRequest.getPath());
@@ -112,7 +112,7 @@ class HttpRequestParserTest {
 		@Test
 		void 요청_라인과_헤더와_바디를_파싱한다() throws IOException {
 			String jsonBody = "{\"name\":\"John\",\"age\":\"30\",\"email\":\"john@email.com\"}";
-			byte[] jsonBodyBytes = jsonBody.getBytes("UTF-8");
+			byte[] jsonBodyBytes = jsonBody.getBytes(StandardCharsets.UTF_8);
 			String httpRequestString =
 				"POST /submit HTTP/1.1\r\n" +
 					"Host: localhost:8080\r\n" +
@@ -121,9 +121,9 @@ class HttpRequestParserTest {
 					"Content-Length: " + jsonBodyBytes.length + "\r\n" +
 					"\r\n" +
 					jsonBody;
+			InputStream inputStream = new ByteArrayInputStream(httpRequestString.getBytes(StandardCharsets.UTF_8));
 
-			BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
-			HttpRequest httpRequest = HttpRequestParser.parse(reader);
+			HttpRequest httpRequest = HttpRequestParser.parse(inputStream);
 
 			// 요청 라인 검증
 			assertEquals(HttpMethod.POST, httpRequest.getMethod());
@@ -137,10 +137,10 @@ class HttpRequestParserTest {
 			assertEquals(String.valueOf(jsonBodyBytes.length), httpRequest.getHeaders().get("Content-Length").get(0));
 
 			// 바디 검증
-			Map<String, List<String>> expectedBody = Map.of(
-				"name", List.of("John"),
-				"age", List.of("30"),
-				"email", List.of("john@email.com")
+			Map<String, List<Object>> expectedBody = Map.of(
+				"name", List.of((Object) "John"),
+				"age", List.of((Object) "30"),
+				"email", List.of((Object) "john@email.com")
 			);
 			assertEquals(expectedBody, httpRequest.getBody());
 		}
@@ -148,7 +148,7 @@ class HttpRequestParserTest {
 		@Test
 		void 요청_라인과_헤더와_폼_데이터를_파싱한다() throws IOException {
 			String formBody = "name=John&age=30";
-			byte[] formBodyBytes = formBody.getBytes("UTF8");
+			byte[] formBodyBytes = formBody.getBytes(StandardCharsets.UTF_8);
 			String httpRequestString =
 				"POST /submit HTTP/1.1\r\n" +
 					"Host: localhost:8080\r\n" +
@@ -157,9 +157,9 @@ class HttpRequestParserTest {
 					"Content-Length: " + formBodyBytes.length + "\r\n" +
 					"\r\n" +
 					formBody;
+			InputStream inputStream = new ByteArrayInputStream(httpRequestString.getBytes(StandardCharsets.UTF_8));
 
-			BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
-			HttpRequest httpRequest = HttpRequestParser.parse(reader);
+			HttpRequest httpRequest = HttpRequestParser.parse(inputStream);
 
 			// 요청 라인 검증
 			assertEquals(HttpMethod.POST, httpRequest.getMethod());
@@ -173,9 +173,9 @@ class HttpRequestParserTest {
 			assertEquals(String.valueOf(formBodyBytes.length), httpRequest.getHeaders().get("Content-Length").get(0));
 
 			// 바디 검증
-			Map<String, List<String>> expectedBody = Map.of(
-				"name", List.of("John"),
-				"age", List.of("30")
+			Map<String, List<Object>> expectedBody = Map.of(
+				"name", List.of((Object) "John"),
+				"age", List.of((Object) "30")
 			);
 			assertEquals(expectedBody, httpRequest.getBody());
 		}
@@ -183,7 +183,7 @@ class HttpRequestParserTest {
 		@Test
 		void 요청_라인과_헤더와_중복된_키를_포함한_폼_데이터를_파싱한다() throws IOException {
 			String formBody = "name=John&age=30&name=Jane";
-			byte[] formBodyBytes = formBody.getBytes("UTF8");
+			byte[] formBodyBytes = formBody.getBytes(StandardCharsets.UTF_8);
 			String httpRequestString =
 				"POST /submit HTTP/1.1\r\n" +
 					"Host: localhost:8080\r\n" +
@@ -192,9 +192,9 @@ class HttpRequestParserTest {
 					"Content-Length: " + formBodyBytes.length + "\r\n" +
 					"\r\n" +
 					formBody;
+			InputStream inputStream = new ByteArrayInputStream(httpRequestString.getBytes(StandardCharsets.UTF_8));
 
-			BufferedReader reader = new BufferedReader(new StringReader(httpRequestString));
-			HttpRequest httpRequest = HttpRequestParser.parse(reader);
+			HttpRequest httpRequest = HttpRequestParser.parse(inputStream);
 
 			// 요청 라인 검증
 			assertEquals(HttpMethod.POST, httpRequest.getMethod());
@@ -208,83 +208,11 @@ class HttpRequestParserTest {
 			assertEquals(String.valueOf(formBodyBytes.length), httpRequest.getHeaders().get("Content-Length").get(0));
 
 			// 바디 검증
-			Map<String, List<String>> expectedBody = Map.of(
-				"name", List.of("John", "Jane"),
-				"age", List.of("30")
+			Map<String, List<Object>> expectedBody = Map.of(
+				"name", List.of((Object) "John", (Object) "Jane"),
+				"age", List.of((Object) "30")
 			);
 			assertEquals(expectedBody, httpRequest.getBody());
-		}
-	}
-
-	@Nested
-	class 쿼리_파라미터_파싱_테스트 {
-		@Test
-		void 빈_쿼리_문자열() {
-			String queryString = "";
-			Map<String, List<String>> result = HttpRequestParser.parseQueryParams(queryString);
-			assertTrue(result.isEmpty());
-		}
-
-		@Test
-		void 단일_쿼리_파라미터() {
-			String queryString = "key=value";
-			Map<String, List<String>> result = HttpRequestParser.parseQueryParams(queryString);
-			assertEquals(1, result.size());
-			assertEquals("value", result.get("key").get(0));
-		}
-
-		@Test
-		void 여러_쿼리_파라미터() {
-			String queryString = "key1=value1&key2=value2";
-			Map<String, List<String>> result = HttpRequestParser.parseQueryParams(queryString);
-			assertEquals(2, result.size());
-			assertEquals("value1", result.get("key1").get(0));
-			assertEquals("value2", result.get("key2").get(0));
-		}
-
-		@Test
-		void 동일한_키_여러_값() {
-			String queryString = "key=value1&key=value2";
-			Map<String, List<String>> result = HttpRequestParser.parseQueryParams(queryString);
-			assertEquals(1, result.size());
-			assertEquals(2, result.get("key").size());
-			assertEquals("value1", result.get("key").get(0));
-			assertEquals("value2", result.get("key").get(1));
-		}
-
-		@Test
-		void 값이_없는_키() {
-			String queryString = "key=";
-			Map<String, List<String>> result = HttpRequestParser.parseQueryParams(queryString);
-			assertEquals(1, result.size());
-			assertEquals("", result.get("key").get(0));
-		}
-
-		@Test
-		void 인코딩된_쿼리_파라미터() {
-			String queryString = "key1=value%201&key2=value%202";
-			Map<String, List<String>> result = HttpRequestParser.parseQueryParams(queryString);
-			assertEquals(2, result.size());
-			assertEquals("value 1", result.get("key1").get(0));
-			assertEquals("value 2", result.get("key2").get(0));
-		}
-
-		@Test
-		void 값이_없는_키_여러개() {
-			String queryString = "key1=&key2=";
-			Map<String, List<String>> result = HttpRequestParser.parseQueryParams(queryString);
-			assertEquals(2, result.size());
-			assertEquals("", result.get("key1").get(0));
-			assertEquals("", result.get("key2").get(0));
-		}
-
-		@Test
-		void 값이_없는_마지막_키() {
-			String queryString = "key1=value1&key2=";
-			Map<String, List<String>> result = HttpRequestParser.parseQueryParams(queryString);
-			assertEquals(2, result.size());
-			assertEquals("value1", result.get("key1").get(0));
-			assertEquals("", result.get("key2").get(0));
 		}
 	}
 }

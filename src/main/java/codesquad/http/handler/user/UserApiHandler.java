@@ -1,4 +1,4 @@
-package codesquad.http.handler;
+package codesquad.http.handler.user;
 
 import static codesquad.server.WebWorker.*;
 
@@ -14,12 +14,12 @@ import codesquad.annotation.HttpHandler;
 import codesquad.http.constants.HttpHandleType;
 import codesquad.http.constants.HttpMethod;
 import codesquad.http.constants.HttpVersion;
-import codesquad.http.dto.HttpRequest;
-import codesquad.http.dto.HttpResponse;
+import codesquad.dto.HttpRequest;
+import codesquad.dto.HttpResponse;
 import codesquad.http.render.RenderData;
 import codesquad.http.status.HttpStatus;
-import codesquad.model.User;
-import codesquad.model.UserRepository;
+import codesquad.model.user.User;
+import codesquad.model.user.UserRepository;
 import codesquad.session.SessionManager;
 
 @HttpHandler
@@ -38,11 +38,11 @@ public class UserApiHandler {
 		HttpRequest httpRequest = HTTP_REQUEST_THREAD_LOCAL.get();
 		HttpResponse httpResponse = HTTP_RESPONSE_THREAD_LOCAL.get();
 
-		Map<String, List<String>> body = httpRequest.getBody();
-		String userId = body.get("userId").get(0);
-		String password = body.get("password").get(0);
-		String name = body.get("name").get(0);
-		String email = body.get("email").get(0);
+		Map<String, List<Object>> body = httpRequest.getBody();
+		String userId = (String)body.get("userId").get(0);
+		String password = (String)body.get("password").get(0);
+		String name = (String)body.get("name").get(0);
+		String email = (String)body.get("email").get(0);
 
 		final User user = new User(userId, password, name, email);
 		userRepository.create(user);
@@ -59,9 +59,9 @@ public class UserApiHandler {
 		HttpRequest httpRequest = HTTP_REQUEST_THREAD_LOCAL.get();
 		HttpResponse httpResponse = HTTP_RESPONSE_THREAD_LOCAL.get();
 
-		Map<String, List<String>> body = httpRequest.getBody();
-		String id = body.get("id").get(0);
-		String password = body.get("password").get(0);
+		Map<String, List<Object>> body = httpRequest.getBody();
+		String id = (String)body.get("id").get(0);
+		String password = (String)body.get("password").get(0);
 		try {
 			User user = userRepository.findById(id);
 			if (user.getPassword().equals(password)) {

@@ -1,4 +1,4 @@
-package codesquad.http.dto;
+package codesquad.dto;
 
 import static codesquad.utils.StringConstants.*;
 
