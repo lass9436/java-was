@@ -5,7 +5,6 @@ public class Post {
 	private String username;
 	private String title;
 	private String content;
-	private String createdAt;
 	private String imageUrl; // 이미지 링크를 저장할 필드 추가
 
 	public Post(String username, String title, String content) {
@@ -42,10 +41,6 @@ public class Post {
 		return content;
 	}
 
-	public String getCreatedAt() {
-		return createdAt;
-	}
-
 	public String getImageUrl() {
 		return imageUrl;
 	}
@@ -61,7 +56,6 @@ public class Post {
 			"\"userId\": \"" + username + "\"," +
 			"\"title\": \"" + title + "\"," +
 			"\"content\": \"" + content + "\"," +
-			"\"createdAt\": \"" + createdAt + "\"," +
 			"\"imageUrl\": \"" + imageUrl + "\"" +
 			'}';
 	}
