@@ -23,8 +23,7 @@ public class CommentRepositoryH2Impl implements CommentRepository {
 		String query = "INSERT INTO comments (post_id, username, content) VALUES (?, ?, ?)";
 
 		try (Connection connection = Database.getConnection();
-			 PreparedStatement statement = connection.prepareStatement(query,
-				 PreparedStatement.RETURN_GENERATED_KEYS)) {
+			 PreparedStatement statement = connection.prepareStatement(query)) {
 
 			statement.setInt(1, comment.getPostId());
 			statement.setString(2, comment.getUsername());
@@ -36,14 +35,6 @@ public class CommentRepositoryH2Impl implements CommentRepository {
 				throw new SQLException("Creating comment failed, no rows affected.");
 			}
 
-			try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-				if (generatedKeys.next()) {
-					comment.setId(generatedKeys.getInt(1));
-					logger.info("Created comment with id {}", comment.getId());
-				} else {
-					throw new SQLException("Creating comment failed, no ID obtained.");
-				}
-			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -67,7 +58,6 @@ public class CommentRepositoryH2Impl implements CommentRepository {
 						resultSet.getString("content")
 					);
 					comment.setId(resultSet.getInt("id"));
-					comment.setCreatedAt(resultSet.getString("created_at"));
 					return comment;
 				}
 			}
@@ -125,7 +115,6 @@ public class CommentRepositoryH2Impl implements CommentRepository {
 					resultSet.getString("content")
 				);
 				comment.setId(resultSet.getInt("id"));
-				comment.setCreatedAt(resultSet.getString("created_at"));
 				comments.add(comment);
 			}
 		} catch (SQLException e) {
@@ -153,7 +142,6 @@ public class CommentRepositoryH2Impl implements CommentRepository {
 						resultSet.getString("content")
 					);
 					comment.setId(resultSet.getInt("id"));
-					comment.setCreatedAt(resultSet.getString("created_at"));
 					comments.add(comment);
 				}
 			}

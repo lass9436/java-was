@@ -18,7 +18,7 @@ public class PostRepositoryH2Impl implements PostRepository {
 		String query = "INSERT INTO posts (username, title, content, image_url) VALUES (?, ?, ?, ?)";
 
 		try (Connection connection = Database.getConnection();
-			 PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+			 PreparedStatement statement = connection.prepareStatement(query)) {
 
 			statement.setString(1, post.getUsername());
 			statement.setString(2, post.getTitle());
@@ -31,13 +31,6 @@ public class PostRepositoryH2Impl implements PostRepository {
 				throw new SQLException("Creating post failed, no rows affected.");
 			}
 
-			try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-				if (generatedKeys.next()) {
-					post.setId(generatedKeys.getInt(1));
-				} else {
-					throw new SQLException("Creating post failed, no ID obtained.");
-				}
-			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -70,7 +63,6 @@ public class PostRepositoryH2Impl implements PostRepository {
 		}
 		return null;
 	}
-
 
 	@Override
 	public Post update(Post post) {
