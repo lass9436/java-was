@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class CsvPreparedStatement implements PreparedStatement {
 
@@ -57,6 +58,11 @@ public class CsvPreparedStatement implements PreparedStatement {
 		return new CsvResultSet(data);
 	}
 
+	private static String unescapeSpecialCharacters(String data) {
+		return data.replace("__COMMA__", ",")
+			.replace("__NEWLINE__", "<br>");
+	}
+
 	private List<Map<String, String>> readCsv(String filePath) throws SQLException {
 		List<Map<String, String>> data = new ArrayList<>();
 		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
@@ -71,7 +77,7 @@ public class CsvPreparedStatement implements PreparedStatement {
 				String[] values = row.split(",");
 				Map<String, String> rowData = new HashMap<>();
 				for (int i = 0; i < columns.length; i++) {
-					rowData.put(columns[i].trim(), values[i].trim());
+					rowData.put(columns[i].trim(), unescapeSpecialCharacters(values[i].trim()));
 				}
 				data.add(rowData);
 			}
@@ -160,12 +166,25 @@ public class CsvPreparedStatement implements PreparedStatement {
 		}
 
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-			writer.write(String.join(",", parameters.stream().map(Object::toString).toArray(String[]::new)));
+			String csvLine = parameters.stream()
+				.map(Object::toString)
+				.map(this::escapeSpecialCharacters)
+				.collect(Collectors.joining(","));
+			writer.write(csvLine);
 			writer.newLine();
 		} catch (IOException e) {
 			throw new SQLException("Failed to write to CSV file.", e);
 		}
 		return 1;
+	}
+
+	private String escapeSpecialCharacters(String data) {
+		String escapedData = data;
+		// Replace CRLF and LF with __NEWLINE__, and commas with __COMMA__
+		escapedData = escapedData.replace("\r\n", "__NEWLINE__")
+			.replace("\n", "__NEWLINE__")
+			.replace(",", "__COMMA__");
+		return escapedData;
 	}
 
 	private int getNextId(String filePath) throws SQLException {
