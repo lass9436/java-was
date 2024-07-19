@@ -44,6 +44,9 @@ public class PostHandler {
 		renderData.addAttribute("user", user);
 		int postId = Integer.parseInt(httpRequest.getParameters().get("postId").get(0));
 		Post post = postRepository.findById(postId);
+		if (post == null) {
+			throw new IllegalArgumentException("존재하지 않는 글입니다.");
+		}
 		renderData.addAttribute("post", post);
 		List<Comment> comments = commentRepository.findByPostId(postId);
 		renderData.addAttribute("comments", comments);

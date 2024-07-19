@@ -89,6 +89,11 @@ public class WebWorker {
 				logger.error("HTTP 상태 코드 예외 발생: ", e);
 				HttpResponse httpResponse = httpErrorHandlerMapper.handle(e);
 				clientOutput.write(httpResponse.getBytes());
+			} catch (RuntimeException e) {
+				logger.error("런타임 예외 발생: ", e);
+				HttpStatusException httpStatusException = new HttpStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+				HttpResponse httpResponse = httpErrorHandlerMapper.handle(httpStatusException);
+				clientOutput.write(httpResponse.getBytes());
 			}
 			// write flush
 			clientOutput.flush();
