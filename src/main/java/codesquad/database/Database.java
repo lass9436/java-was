@@ -19,8 +19,8 @@ public class Database {
 
 	public static Connection getConnection() throws SQLException {
 		DriverManager.registerDriver(new CsvDriver());
-		//return DriverManager.getConnection(JDBC_URL_CSV);
-		return DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+		return DriverManager.getConnection(JDBC_URL_CSV);
+		//return DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
 	}
 
 	public static void initializeDatabase() {
